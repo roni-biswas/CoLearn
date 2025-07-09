@@ -20,15 +20,28 @@ const navLinks = [
 
 const NavBar = () => {
   const [isSticky, setIsSticky] = useState(false);
+  const [scrollDir, setScrollDir] = useState("up");
+  const [lastScrollY, setLastScrollY] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setIsSticky(window.scrollY > 80);
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      setIsSticky(currentScrollY > 80);
+
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        setScrollDir("down");
+      } else if (currentScrollY < lastScrollY) {
+        setScrollDir("up");
+      }
+      setLastScrollY(currentScrollY);
+    };
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [lastScrollY]);
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -44,18 +57,11 @@ const NavBar = () => {
 
   return (
     <header
-      className={`fixed top-0 w-full z-50 transition-all duration-500 backdrop-blur-md
-        ${
-          isSticky
-            ? "bg-base-100 shadow"
-            : "lg:bg-gradient-to-b lg:from-base-100/80 lg:to-transparent bg-black/40"
-        }
-        dark:${
-          isSticky
-            ? "bg-gray-900/50 shadow"
-            : "lg:bg-gradient-to-b lg:from-gray-900/80 lg:to-transparent bg-black/50"
-        }
-      `}
+      className={`fixed top-0 w-full z-50 transition-all  duration-300 ${
+        scrollDir === "down" ? "-translate-y-full" : "translate-y-0"
+      } ${
+        isSticky ? "bg-gray-900/40 backdrop-blur-2xl shadow" : "bg-transparent"
+      }`}
     >
       <Container>
         <div className="py-3 flex items-center justify-between">
@@ -71,14 +77,19 @@ const NavBar = () => {
           </Link>
 
           {/* Desktop Nav Links */}
-          <nav className="hidden lg:flex items-center gap-6 font-medium">
+          <nav className="hidden lg:flex items-center gap-6 text-base font-bold">
             {navLinks.map((link) => (
               <NavLink
                 key={link.name}
                 to={link.path}
                 className={({ isActive }) =>
                   `relative px-2 py-1 group transition-colors duration-200 
-         ${isActive ? "text-primary font-medium" : "text-gray-200"}`
+                  ${
+                    isActive
+                      ? "text-primary font-bold text-base"
+                      : "text-gray-200"
+                  }
+                  ${isSticky ? "text-black" : "text-gray-200"} `
                 }
               >
                 {link.name}
@@ -109,7 +120,7 @@ const NavBar = () => {
                       <li>
                         <Link
                           to="/dashboard"
-                          className="block px-4 py-2 text-sm rounded-md hover:bg-base-200 dark:hover:bg-gray-700"
+                          className="block px-4 py-2 text-sm rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
                           onClick={() => setDropdownOpen(false)}
                         >
                           Dashboard
@@ -121,7 +132,7 @@ const NavBar = () => {
                             setDropdownOpen(false);
                             alert("Logout clicked");
                           }}
-                          className="w-full text-left px-4 py-2 text-sm rounded-md hover:bg-base-200 dark:hover:bg-gray-700"
+                          className="w-full text-left px-4 py-2 text-sm rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
                         >
                           Logout
                         </button>
@@ -174,7 +185,7 @@ const NavBar = () => {
                   onClick={() => setIsOpen(false)}
                   className={({ isActive }) =>
                     isActive
-                      ? "text-primary"
+                      ? "text-primary font-bold"
                       : "hover:text-primary transition-colors"
                   }
                 >

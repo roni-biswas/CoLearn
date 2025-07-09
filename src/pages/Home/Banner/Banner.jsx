@@ -22,7 +22,7 @@ const Banner = () => {
       style={{ backgroundImage: `url(${bannerImage})` }}
     >
       {/* Overlay */}
-      <div className="absolute inset-0 bg-black/60 dark:bg-black/70 z-0" />
+      <div className="absolute inset-0 bg-black/80 z-0" />
 
       <Container>
         <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8 h-full">
@@ -142,7 +142,7 @@ const Banner = () => {
 
       {/* Scroll Down Icon */}
       <motion.div
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white dark:text-gray-300"
+        className="absolute bottom-12 left-1/2 -translate-x-1/2 text-white dark:text-gray-300"
         animate={{ y: [0, -10, 0] }}
         transition={{ repeat: Infinity, duration: 2 }}
         aria-hidden="true"
