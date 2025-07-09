@@ -57,11 +57,14 @@ const NavBar = () => {
 
   return (
     <header
-      className={`fixed top-0 w-full z-50 transition-all  duration-300 ${
-        scrollDir === "down" ? "-translate-y-full" : "translate-y-0"
-      } ${
-        isSticky ? "bg-gray-900/40 backdrop-blur-2xl shadow" : "bg-transparent"
-      }`}
+      className={`fixed top-0 w-full z-50 transition-all duration-300 
+    ${scrollDir === "down" ? "-translate-y-full" : "translate-y-0"}
+    ${
+      isSticky
+        ? "h-16 bg-gray-900/40 backdrop-blur-2xl shadow"
+        : "h-24 bg-gradient-to-b from-black/70 to-transparent"
+    }
+  `}
     >
       <Container>
         <div className="py-3 flex items-center justify-between">
@@ -155,7 +158,7 @@ const NavBar = () => {
           <div className="lg:hidden z-50">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="text-base-content"
+              className="text-gray-100"
             >
               {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
             </button>
