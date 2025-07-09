@@ -1,20 +1,11 @@
 /* Google Fonts: Outfit (heading), Inter (body) */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Outfit:wght@600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Outfit:wght@100..900&display=swap");
 
 @import "tailwindcss";
 @plugin "daisyui";
 
-@plugin "daisyui/theme" {
-  name: "light";
-  default: true;
-  --color-primary: #3b82f6; /* Tailwind blue-500 */
-  --color-secondary: #22c55e; /* Tailwind green-500 */
-  --color-base-100: #f9fafb; /* Background */
-  --color-base-content: #1f2937; /* Text color */
-}
-
 body {
-  font-family: var(--font-body);
+  font-family: "Inter", sans-serif;
 }
 
 /* Headings use Outfit font */
@@ -24,5 +15,5 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-heading);
+  font-family: "Outfit", sans-serif;
 }
