@@ -1,0 +1,237 @@
+import { useEffect, useState, useRef } from "react";
+import { Link, NavLink } from "react-router";
+import { FaBars, FaTimes } from "react-icons/fa";
+import { motion, AnimatePresence } from "framer-motion";
+import Container from "../../../components/Container";
+import logoDark from "../../../assets/logo1.png";
+import logoLight from "../../../assets/logo2.png";
+import defaultAvatar from "../../../assets/avatar.png";
+
+const user = {
+  displayName: "John Doe",
+  photoURL: "", // or a real URL
+};
+
+const navLinks = [
+  { name: "Home", path: "/" },
+  { name: "Tutors", path: "/tutors" },
+  { name: "Study Sessions", path: "/sessions" },
+];
+
+const NavBar = () => {
+  const [isSticky, setIsSticky] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setIsSticky(window.scrollY > 80);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    }
+    if (dropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [dropdownOpen]);
+
+  return (
+    <header
+      className={`fixed top-0 w-full z-50 transition-all duration-500 backdrop-blur-md
+        ${
+          isSticky
+            ? "bg-base-100 shadow"
+            : "lg:bg-gradient-to-b lg:from-base-100/80 lg:to-transparent bg-black/40"
+        }
+        dark:${
+          isSticky
+            ? "bg-gray-900/50 shadow"
+            : "lg:bg-gradient-to-b lg:from-gray-900/80 lg:to-transparent bg-black/50"
+        }
+      `}
+    >
+      <Container>
+        <div className="py-3 flex items-center justify-between">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2">
+            <motion.img
+              src={isSticky ? logoDark : logoLight}
+              alt="Logo"
+              className="h-10"
+              animate={{ scale: isSticky ? 0.9 : 1 }}
+              transition={{ type: "spring", stiffness: 120 }}
+            />
+          </Link>
+
+          {/* Desktop Nav Links */}
+          <nav className="hidden lg:flex items-center gap-6 font-medium">
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.name}
+                to={link.path}
+                className={({ isActive }) =>
+                  `relative px-2 py-1 group transition-colors duration-200 
+         ${isActive ? "text-primary font-medium" : "text-gray-200"}`
+                }
+              >
+                {link.name}
+                <span className="absolute bottom-0 left-1/2 w-0 h-[2px] bg-primary transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
+              </NavLink>
+            ))}
+          </nav>
+
+          {/* Desktop Right */}
+          <div className="hidden lg:flex items-center gap-4 relative">
+            {user ? (
+              <div className="relative" ref={dropdownRef}>
+                <img
+                  src={user.photoURL || defaultAvatar}
+                  alt="User"
+                  className="w-10 h-10 rounded-full border-2 border-primary object-cover cursor-pointer hover:scale-105 transition-transform"
+                  onClick={() => setDropdownOpen((prev) => !prev)}
+                />
+                <AnimatePresence>
+                  {dropdownOpen && (
+                    <motion.ul
+                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute right-0 mt-2 w-44 bg-base-100 dark:bg-gray-800 rounded-md shadow-md p-2 space-y-1"
+                    >
+                      <li>
+                        <Link
+                          to="/dashboard"
+                          className="block px-4 py-2 text-sm rounded-md hover:bg-base-200 dark:hover:bg-gray-700"
+                          onClick={() => setDropdownOpen(false)}
+                        >
+                          Dashboard
+                        </Link>
+                      </li>
+                      <li>
+                        <button
+                          onClick={() => {
+                            setDropdownOpen(false);
+                            alert("Logout clicked");
+                          }}
+                          className="w-full text-left px-4 py-2 text-sm rounded-md hover:bg-base-200 dark:hover:bg-gray-700"
+                        >
+                          Logout
+                        </button>
+                      </li>
+                    </motion.ul>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className="btn btn-sm btn-outline border-primary text-primary hover:bg-primary hover:text-white"
+              >
+                Login
+              </Link>
+            )}
+          </div>
+
+          {/* Mobile Menu Toggle */}
+          <div className="lg:hidden z-50">
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="text-base-content"
+            >
+              {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+            </button>
+          </div>
+        </div>
+      </Container>
+
+      {/* Mobile Sidebar */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.aside
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            className="fixed top-0 left-0 w-[70%] h-screen bg-gray-900 z-40 shadow-xl p-6 flex flex-col rounded-r-2xl gap-6"
+          >
+            <Link to="/" onClick={() => setIsOpen(false)}>
+              <img src={logoDark} alt="Logo" className="h-10 mb-6" />
+            </Link>
+
+            <nav className="flex flex-col gap-4 text-gray-100 font-semibold">
+              {navLinks.map((link) => (
+                <NavLink
+                  key={link.name}
+                  to={link.path}
+                  onClick={() => setIsOpen(false)}
+                  className={({ isActive }) =>
+                    isActive
+                      ? "text-primary"
+                      : "hover:text-primary transition-colors"
+                  }
+                >
+                  {link.name}
+                </NavLink>
+              ))}
+              {/* Dashboard Link if user exists */}
+
+              <NavLink
+                to="/dashboard"
+                onClick={() => setIsOpen(false)}
+                className={({ isActive }) =>
+                  isActive
+                    ? "text-primary"
+                    : "hover:text-primary transition-colors"
+                }
+              >
+                Dashboard
+              </NavLink>
+
+              {/* Login Button if no user */}
+
+              <NavLink
+                to="/login"
+                onClick={() => setIsOpen(false)}
+                className={({ isActive }) =>
+                  isActive
+                    ? "text-primary"
+                    : "hover:text-primary transition-colors"
+                }
+              >
+                Login
+              </NavLink>
+            </nav>
+
+            <div className="mt-auto flex flex-col gap-4">
+              {user ? (
+                <img
+                  src={user.photoURL || defaultAvatar}
+                  alt="User"
+                  className="w-10 h-10 rounded-full border-2 border-primary object-cover"
+                />
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={() => setIsOpen(false)}
+                  className="btn btn-primary btn-sm text-white"
+                >
+                  Login
+                </Link>
+              )}
+            </div>
+          </motion.aside>
+        )}
+      </AnimatePresence>
+    </header>
+  );
+};
+
+export default NavBar;
