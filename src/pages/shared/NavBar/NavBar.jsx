@@ -1,16 +1,13 @@
 import { useEffect, useState, useRef } from "react";
-import { Link, NavLink } from "react-router";
+import { Link, NavLink, useNavigate } from "react-router";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import Container from "../../../components/Container";
 import logoDark from "../../../assets/logo1.png";
 import logoLight from "../../../assets/logo2.png";
 import defaultAvatar from "../../../assets/avatar.png";
-
-const user = {
-  displayName: "John Doe",
-  photoURL: "", // or a real URL
-};
+import useAuth from "../../../hooks/useAuth";
+import Swal from "sweetalert2";
 
 const navLinks = [
   { name: "Home", path: "/" },
@@ -19,6 +16,8 @@ const navLinks = [
 ];
 
 const NavBar = () => {
+  const { user, logOut } = useAuth();
+  const navigate = useNavigate();
   const [isSticky, setIsSticky] = useState(false);
   const [scrollDir, setScrollDir] = useState("up");
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -54,6 +53,27 @@ const NavBar = () => {
     }
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [dropdownOpen]);
+
+  const handleLogout = () => {
+    logOut()
+      .then(() => {
+        Swal.fire({
+          title: "Logout Successful",
+          text: "You have been logged out.",
+          icon: "success",
+          confirmButtonText: "OK",
+        });
+        navigate("/");
+      })
+      .catch((error) => {
+        Swal.fire({
+          title: "Logout Failed",
+          text: error.message,
+          icon: "error",
+          confirmButtonText: "Try Again",
+        });
+      });
+  };
 
   return (
     <header
@@ -103,60 +123,56 @@ const NavBar = () => {
 
           {/* Desktop Right */}
           <div className="hidden lg:flex items-center gap-4 relative">
-            {user ? (
-              <div className="relative" ref={dropdownRef}>
-                <img
-                  src={user.photoURL || defaultAvatar}
-                  alt="User"
-                  className="w-10 h-10 rounded-full border-2 border-primary object-cover cursor-pointer hover:scale-105 transition-transform"
-                  onClick={() => setDropdownOpen((prev) => !prev)}
-                />
-                <AnimatePresence>
-                  {dropdownOpen && (
-                    <motion.ul
-                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute right-0 mt-2 w-44 bg-base-100 dark:bg-gray-800 rounded-md shadow-md p-2 space-y-1"
-                    >
-                      <li>
-                        <Link
-                          to="/dashboard"
-                          className="block px-4 py-2 text-sm rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
-                          onClick={() => setDropdownOpen(false)}
-                        >
-                          Dashboard
-                        </Link>
-                      </li>
-                      <li>
-                        <button
-                          onClick={() => {
-                            setDropdownOpen(false);
-                            alert("Logout clicked");
-                          }}
-                          className="w-full text-left px-4 py-2 text-sm rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
-                        >
-                          Logout
-                        </button>
-                      </li>
+            <div className="relative" ref={dropdownRef}>
+              <img
+                src={user?.photoURL || defaultAvatar}
+                alt="User"
+                className="w-10 h-10 rounded-full border-2 border-primary object-cover cursor-pointer hover:scale-105 transition-transform"
+                onClick={() => setDropdownOpen((prev) => !prev)}
+              />
+              <AnimatePresence>
+                {dropdownOpen && (
+                  <motion.ul
+                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute right-0 mt-2 w-44 bg-base-100 dark:bg-gray-800 rounded-md shadow-md p-2 space-y-1"
+                  >
+                    {user ? (
+                      <>
+                        <li>
+                          <Link
+                            to="/dashboard"
+                            className="block px-4 py-2 text-sm rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
+                            onClick={() => setDropdownOpen(false)}
+                          >
+                            Dashboard
+                          </Link>
+                        </li>
+                        <li>
+                          <button
+                            onClick={() => {
+                              setDropdownOpen(false);
+                              handleLogout();
+                            }}
+                            className="w-full text-left px-4 py-2 text-sm rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
+                          >
+                            Logout
+                          </button>
+                        </li>
+                      </>
+                    ) : (
                       <Link to="/login">
                         <button className="w-full text-left px-4 py-2 text-sm rounded-md hover:bg-gray-200 dark:hover:bg-gray-700">
                           Login
                         </button>
                       </Link>
-                    </motion.ul>
-                  )}
-                </AnimatePresence>
-              </div>
-            ) : (
-              <Link
-                to="/login"
-                className="btn btn-sm btn-outline border-primary text-primary hover:bg-primary hover:text-white"
-              >
-                Login
-              </Link>
-            )}
+                    )}
+                  </motion.ul>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
 
           {/* Mobile Menu Toggle */}
@@ -201,50 +217,56 @@ const NavBar = () => {
                 </NavLink>
               ))}
               {/* Dashboard Link if user exists */}
+              {user ? (
+                <>
+                  <NavLink
+                    to="/dashboard"
+                    onClick={() => setIsOpen(false)}
+                    className={({ isActive }) =>
+                      isActive
+                        ? "text-primary"
+                        : "hover:text-primary transition-colors"
+                    }
+                  >
+                    Dashboard
+                  </NavLink>
+                  <NavLink>
+                    <button
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        handleLogout();
+                      }}
+                      className="hover:text-primary transition-colors"
+                    >
+                      Logout
+                    </button>
+                  </NavLink>
+                </>
+              ) : (
+                <>
+                  {/* Login Button if no user */}
 
-              <NavLink
-                to="/dashboard"
-                onClick={() => setIsOpen(false)}
-                className={({ isActive }) =>
-                  isActive
-                    ? "text-primary"
-                    : "hover:text-primary transition-colors"
-                }
-              >
-                Dashboard
-              </NavLink>
-
-              {/* Login Button if no user */}
-
-              <NavLink
-                to="/login"
-                onClick={() => setIsOpen(false)}
-                className={({ isActive }) =>
-                  isActive
-                    ? "text-primary"
-                    : "hover:text-primary transition-colors"
-                }
-              >
-                Login
-              </NavLink>
+                  <NavLink
+                    to="/login"
+                    onClick={() => setIsOpen(false)}
+                    className={({ isActive }) =>
+                      isActive
+                        ? "text-primary"
+                        : "hover:text-primary transition-colors"
+                    }
+                  >
+                    Login
+                  </NavLink>
+                </>
+              )}
             </nav>
 
             <div className="mt-auto flex flex-col gap-4">
-              {user ? (
-                <img
-                  src={user.photoURL || defaultAvatar}
-                  alt="User"
-                  className="w-10 h-10 rounded-full border-2 border-primary object-cover"
-                />
-              ) : (
-                <Link
-                  to="/login"
-                  onClick={() => setIsOpen(false)}
-                  className="btn btn-primary btn-sm text-white"
-                >
-                  Login
-                </Link>
-              )}
+              <img
+                src={user?.photoURL || defaultAvatar}
+                alt="User"
+                className="w-10 h-10 rounded-full border-2 border-primary object-cover"
+              />
             </div>
           </motion.aside>
         )}

@@ -4,9 +4,16 @@ import Container from "../../../components/Container";
 import loginLottie from "../../../assets/animation/lottie-login.json";
 import PageHero from "../../../components/PageHero";
 import heroImg from "../../../assets/page-hero.jpg";
-import { Link } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
+import Swal from "sweetalert2";
+import useAuth from "../../../hooks/useAuth";
 
 const Login = () => {
+  const { signIn } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from;
+
   const {
     register,
     handleSubmit,
@@ -14,17 +21,37 @@ const Login = () => {
   } = useForm();
 
   const onSubmit = async (data) => {
-    console.log(data);
+    const { email, password } = data;
+    signIn(email, password)
+      .then((result) => {
+        if (result.user) {
+          Swal.fire({
+            title: "Login Successful",
+            text: "Welcome back!",
+            icon: "success",
+            confirmButtonText: "OK",
+          });
+          navigate(`${location?.state ? from : "/"}`);
+        }
+      })
+      .catch((error) => {
+        Swal.fire({
+          title: "Login Failed",
+          text: error.message,
+          icon: "error",
+          confirmButtonText: "Try Again",
+        });
+      });
   };
 
   return (
     <>
       <PageHero title="Login" heroBg={heroImg} />
-      <div className="min-h-screen flex items-center justify-center bg-base-200 ">
+      <div className="py-12 flex items-center justify-center bg-base-200 ">
         <Container>
           <div className="flex flex-col lg:flex-row items-center justify-center gap-12">
             {/* Left: Lottie */}
-            <div className="flex-1 hidden md:flex justify-center">
+            <div className="flex-1 justify-center">
               <Player
                 autoplay
                 loop
@@ -34,7 +61,7 @@ const Login = () => {
             </div>
 
             {/* Right: Form */}
-            <div className="flex-1 w-full max-w-md bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-8 space-y-6">
+            <div className="flex-1 w-full bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-8 space-y-6">
               <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-white">
                 Login to Your Account
               </h2>

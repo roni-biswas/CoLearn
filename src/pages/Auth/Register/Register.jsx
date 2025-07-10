@@ -90,7 +90,7 @@ const Register = () => {
             </div>
 
             {/* Right Side - Form */}
-            <div className="flex-1 bg-base-100 dark:bg-gray-900 p-8 rounded-xl shadow-lg">
+            <div className="flex-1 w-full bg-base-100 dark:bg-gray-900 p-8 rounded-xl shadow-lg">
               <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
                 Create Your Account
               </h2>
