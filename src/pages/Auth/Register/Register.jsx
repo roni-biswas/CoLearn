@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import Container from "../../../components/Container";
 import { Player } from "@lottiefiles/react-lottie-player";
 import lottieAnimation from "../../../assets/animation/lottie-register.json";
@@ -9,11 +9,14 @@ import Swal from "sweetalert2";
 import useAuth from "../../../hooks/useAuth";
 import uploadToCloudinary from "../../../services/uploadToCloudinary";
 import { useState } from "react";
+import SocialLogin from "../SocialLogin/SocialLogin";
 
 const Register = () => {
   const { createUser, updateUserProfile } = useAuth();
   const navigate = useNavigate();
   const [preview, setPreview] = useState(null);
+  const location = useLocation();
+  const from = location.state?.from;
 
   const {
     register,
@@ -41,9 +44,7 @@ const Register = () => {
 
         // 4. Send to your backend
         const userInfo = {
-          name,
           email,
-          photo: imageUrl,
           role: "student", // default
           created_at: new Date().toISOString(),
           last_log_in: new Date().toISOString(),
@@ -194,15 +195,15 @@ const Register = () => {
                 <button className="btn btn-secondary w-full" type="submit">
                   Register
                 </button>
-
-                {/* Login Link */}
-                <p className="text-sm text-center text-gray-500 mt-4">
-                  Already have an account?{" "}
-                  <Link to="/login" className="text-primary hover:underline">
-                    Login here
-                  </Link>
-                </p>
               </form>
+              {/* Login Link */}
+              <p className="text-sm text-center text-gray-500 mt-4">
+                Already have an account?{" "}
+                <Link to="/login" className="text-primary hover:underline">
+                  Login here
+                </Link>
+              </p>
+              <SocialLogin from={from} />
             </div>
           </div>
         </Container>

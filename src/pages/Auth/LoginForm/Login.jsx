@@ -7,6 +7,7 @@ import heroImg from "../../../assets/page-hero.jpg";
 import { Link, useLocation, useNavigate } from "react-router";
 import Swal from "sweetalert2";
 import useAuth from "../../../hooks/useAuth";
+import SocialLogin from "../SocialLogin/SocialLogin";
 
 const Login = () => {
   const { signIn } = useAuth();
@@ -35,12 +36,14 @@ const Login = () => {
         }
       })
       .catch((error) => {
-        Swal.fire({
-          title: "Login Failed",
-          text: error.message,
-          icon: "error",
-          confirmButtonText: "Try Again",
-        });
+        if (error.message) {
+          Swal.fire({
+            title: "Login Failed",
+            text: "Invalid email or password!",
+            icon: "error",
+            confirmButtonText: "Try Again",
+          });
+        }
       });
   };
 
@@ -120,6 +123,7 @@ const Login = () => {
                   Register here
                 </Link>
               </p>
+              <SocialLogin from={from} />
             </div>
           </div>
         </Container>
