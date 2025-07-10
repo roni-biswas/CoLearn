@@ -4,6 +4,7 @@ import Container from "../../../components/Container";
 import loginLottie from "../../../assets/animation/lottie-login.json";
 import PageHero from "../../../components/PageHero";
 import heroImg from "../../../assets/page-hero.jpg";
+import { Link } from "react-router";
 
 const Login = () => {
   const {
@@ -88,9 +89,9 @@ const Login = () => {
 
               <p className="text-center text-sm text-gray-600 dark:text-gray-400">
                 Don’t have an account?{" "}
-                <a href="/register" className="text-primary font-semibold">
+                <Link to="/register" className="text-primary font-semibold">
                   Register here
-                </a>
+                </Link>
               </p>
             </div>
           </div>

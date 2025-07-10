@@ -1,13 +1,20 @@
 import { useForm } from "react-hook-form";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import Container from "../../../components/Container";
-import { useState } from "react";
 import { Player } from "@lottiefiles/react-lottie-player";
 import lottieAnimation from "../../../assets/animation/lottie-register.json";
 import PageHero from "../../../components/PageHero";
 import heroImg from "../../../assets/page-hero.jpg";
+import Swal from "sweetalert2";
+import useAuth from "../../../hooks/useAuth";
+import uploadToCloudinary from "../../../services/uploadToCloudinary";
+import { useState } from "react";
 
 const Register = () => {
+  const { createUser, updateUserProfile } = useAuth();
+  const navigate = useNavigate();
+  const [preview, setPreview] = useState(null);
+
   const {
     register,
     handleSubmit,
@@ -15,18 +22,48 @@ const Register = () => {
     formState: { errors },
   } = useForm();
 
-  const [preview, setPreview] = useState(null);
+  const onSubmit = async (data) => {
+    try {
+      const { name, email, password, photo } = data;
 
-  const onSubmit = (data) => {
-    const { name, email, password, photo } = data;
-    const file = photo[0];
+      // 1. Create Firebase user
+      const result = await createUser(email, password);
 
-    if (!file) return alert("Please upload a photo.");
+      if (result.user) {
+        // 2. Upload image to Cloudinary
+        const imageUrl = await uploadToCloudinary(photo[0]);
 
-    // You can now send 'file', name, email, password to Firebase/Auth API
-    console.log({ name, email, password, file });
+        // 3. Update Firebase profile
+        await updateUserProfile({
+          displayName: name,
+          photoURL: imageUrl,
+        });
 
-    reset();
+        // 4. Send to your backend
+        const userInfo = {
+          name,
+          email,
+          photo: imageUrl,
+          role: "student", // default
+          created_at: new Date().toISOString(),
+          last_log_in: new Date().toISOString(),
+        };
+
+        // await axiosInstance.post("/users", userInfo);
+        console.log(userInfo);
+
+        // 5. Success
+        Swal.fire("Success!", "Account created successfully", "success");
+        navigate("/");
+        reset();
+      }
+    } catch (error) {
+      if (error.code === "auth/email-already-in-use") {
+        Swal.fire("Error", "Email already in use!", "error");
+      } else {
+        Swal.fire("Error", error.message || "Something went wrong", "error");
+      }
+    }
   };
 
   const handlePreview = (e) => {
@@ -43,7 +80,7 @@ const Register = () => {
         <Container>
           <div className="flex flex-col lg:flex-row items-center gap-8">
             {/* Left Side - Lottie Animation or Image */}
-            <div className="w-full lg:w-1/2 flex justify-center items-center">
+            <div className="flex-1 flex justify-center items-center">
               <Player
                 autoplay
                 loop
@@ -53,7 +90,7 @@ const Register = () => {
             </div>
 
             {/* Right Side - Form */}
-            <div className="w-full lg:w-1/2 bg-base-100 dark:bg-gray-900 p-8 rounded-xl shadow-lg">
+            <div className="flex-1 bg-base-100 dark:bg-gray-900 p-8 rounded-xl shadow-lg">
               <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
                 Create Your Account
               </h2>
