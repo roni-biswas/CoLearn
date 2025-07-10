@@ -9,6 +9,8 @@
   default: true;
   --color-primary: #605dff;
   --color-secondary: #7ed956;
+  --color-base-100: #f9fafb;
+  --color-base-200: #f3f4f6;
 }
 
 body {

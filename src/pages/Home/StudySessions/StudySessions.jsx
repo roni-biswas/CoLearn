@@ -83,10 +83,10 @@ const StudySessions = () => {
     <section className="py-16 bg-gray-100">
       <Container>
         <div className="text-center mb-12" data-aos="fade-up">
-          <h2 className="text-3xl md:text-4xl font-bold text-base-content dark:text-white">
+          <h2 className="text-3xl md:text-4xl font-bold text-primary">
             Available Study Sessions
           </h2>
-          <p className="text-base-content mt-2 dark:text-gray-400">
+          <p className=" mt-2 text-gray-600">
             Join ongoing sessions and boost your learning!
           </p>
         </div>
@@ -100,16 +100,16 @@ const StudySessions = () => {
             return (
               <div
                 key={session._id}
-                className="p-6 bg-white rounded-xl shadow border border-base-200 hover:shadow-md transition duration-300 flex flex-col justify-between h-[260px]"
+                className="p-6 bg-white rounded-xl shadow border border-gray-200 hover:shadow-md transition duration-300 flex flex-col justify-between h-[260px]"
                 data-aos="zoom-in"
                 data-aos-delay={index * 100}
               >
                 <div>
-                  <h3 className="text-xl font-semibold mb-2 text-base-content dark:text-white">
+                  <h3 className="text-xl font-semibold mb-2 text-gray-800">
                     {session.title}
                   </h3>
 
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                  <p className="text-sm text-gray-600 mb-4">
                     {truncateText(session.description, 70)}
                   </p>
                 </div>
