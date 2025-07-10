@@ -61,7 +61,7 @@ const NavBar = () => {
     ${scrollDir === "down" ? "-translate-y-full" : "translate-y-0"}
     ${
       isSticky
-        ? "h-16 bg-gray-900/40 backdrop-blur-2xl shadow"
+        ? "h-16 bg-gray-950/80 backdrop-blur-3xl shadow"
         : "h-24 bg-gradient-to-b from-black/70 to-transparent"
     }
   `}
@@ -140,6 +140,11 @@ const NavBar = () => {
                           Logout
                         </button>
                       </li>
+                      <Link to="/login">
+                        <button className="w-full text-left px-4 py-2 text-sm rounded-md hover:bg-gray-200 dark:hover:bg-gray-700">
+                          Login
+                        </button>
+                      </Link>
                     </motion.ul>
                   )}
                 </AnimatePresence>
