@@ -18,6 +18,8 @@ import AdminSessions from "../pages/Dashboard/Admin/AdminSessions/AdminSessions"
 import AdminMaterials from "../pages/Dashboard/Admin/AdminMaterials/AdminMaterials";
 import StudySessions from "../pages/StudySessions/StudySessions";
 import SessionDetails from "../pages/StudySessions/SessionDetails";
+import Tutors from "../pages/Tutors/Tutors";
+import TutorDetails from "../pages/Tutors/TutorDetails";
 
 const router = createBrowserRouter([
   {
@@ -27,6 +29,14 @@ const router = createBrowserRouter([
       {
         index: true,
         Component: Home,
+      },
+      {
+        path: "tutors",
+        Component: Tutors,
+      },
+      {
+        path: "tutor-details/:id",
+        Component: TutorDetails,
       },
       {
         path: "sessions",
