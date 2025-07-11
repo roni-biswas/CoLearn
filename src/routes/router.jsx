@@ -22,6 +22,7 @@ import Tutors from "../pages/Tutors/Tutors";
 import TutorDetails from "../pages/Tutors/TutorDetails";
 import About from "../pages/About/About";
 import Contact from "../pages/Contact/Contact";
+import MakeAdmin from "../pages/Dashboard/Admin/MakeAdmin/MakeAdmin";
 
 const router = createBrowserRouter([
   {
@@ -120,6 +121,10 @@ const router = createBrowserRouter([
       {
         path: "admin-materials",
         element: <AdminMaterials />,
+      },
+      {
+        path: "make-admin",
+        element: <MakeAdmin />,
       },
     ],
   },

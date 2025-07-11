@@ -1,4 +1,4 @@
-import { Link, Outlet } from "react-router";
+import { Link, NavLink, Outlet } from "react-router";
 import {
   FaRegCalendarAlt,
   FaEdit,
@@ -11,9 +11,16 @@ import {
   FaUserShield,
   FaLayerGroup,
 } from "react-icons/fa";
-import { FiMenu } from "react-icons/fi";
+import { FiMenu, FiShield } from "react-icons/fi";
 import { useState } from "react";
 import logo from "../assets/logo1.png";
+
+const activeClass = ({ isActive }) =>
+  `flex items-center px-3 py-2 rounded-md transition-colors duration-200 text-sm font-medium shadow-sm ${
+    isActive
+      ? "bg-gray-200 dark:bg-gray-700 text-primary"
+      : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+  }`;
 
 const DashboardLayout = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -31,7 +38,7 @@ const DashboardLayout = () => {
       />
       <div className="drawer-content flex flex-col">
         {/* Top bar */}
-        <div className="flex items-center justify-between px-4 py-3 border-b shadow-sm lg:hidden">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-b-gray-200 shadow-sm lg:hidden">
           <Link to="/">
             <img src={logo} alt="Logo" className="h-10" />
           </Link>
@@ -50,59 +57,64 @@ const DashboardLayout = () => {
             <img src={logo} alt="Logo" className="h-12 mx-auto" />
           </Link>
           <li>
-            <Link to="/dashboard/booked-sessions">
+            <NavLink to="/dashboard/booked-sessions" className={activeClass}>
               <FaRegCalendarAlt className="mr-2" /> View Booked Session
-            </Link>
+            </NavLink>
           </li>
           <li>
-            <Link to="/dashboard/create-note">
+            <NavLink to="/dashboard/create-note" className={activeClass}>
               <FaEdit className="mr-2" /> Create Note
-            </Link>
+            </NavLink>
           </li>
           <li>
-            <Link to="/dashboard/manage-notes">
+            <NavLink to="/dashboard/manage-notes" className={activeClass}>
               <FaClipboardCheck className="mr-2" /> Manage Personal Notes
-            </Link>
+            </NavLink>
           </li>
           <li>
-            <Link to="/dashboard/study-materials">
+            <NavLink to="/dashboard/study-materials" className={activeClass}>
               <FaFolder className="mr-2" /> View All Study Materials
-            </Link>
+            </NavLink>
           </li>
           <li>
-            <Link to="/dashboard/create-session">
+            <NavLink to="/dashboard/create-session" className={activeClass}>
               <FaPlusSquare className="mr-2" /> Create Study Session
-            </Link>
+            </NavLink>
           </li>
           <li>
-            <Link to="/dashboard/all-sessions">
+            <NavLink to="/dashboard/all-sessions" className={activeClass}>
               <FaChalkboardTeacher className="mr-2" /> View All Study Sessions
-            </Link>
+            </NavLink>
           </li>
           <li>
-            <Link to="/dashboard/upload-materials">
+            <NavLink to="/dashboard/upload-materials" className={activeClass}>
               <FaFileAlt className="mr-2" /> Upload Materials
-            </Link>
+            </NavLink>
           </li>
           <li>
-            <Link to="/dashboard/all-materials">
+            <NavLink to="/dashboard/all-materials" className={activeClass}>
               <FaFolder className="mr-2" /> View All Materials
-            </Link>
+            </NavLink>
           </li>
           <li>
-            <Link to="/dashboard/all-users">
+            <NavLink to="/dashboard/all-users" className={activeClass}>
               <FaUserFriends className="mr-2" /> View All Users
-            </Link>
+            </NavLink>
           </li>
           <li>
-            <Link to="/dashboard/admin-sessions">
+            <NavLink to="/dashboard/admin-sessions" className={activeClass}>
               <FaUserShield className="mr-2" /> Admin Study Sessions
-            </Link>
+            </NavLink>
           </li>
           <li>
-            <Link to="/dashboard/admin-materials">
+            <NavLink to="/dashboard/admin-materials" className={activeClass}>
               <FaLayerGroup className="mr-2" /> Admin Study Materials
-            </Link>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/dashboard/make-admin" className={activeClass}>
+              <FiShield className="inline mr-2" /> Make Admin
+            </NavLink>
           </li>
         </ul>
       </div>
