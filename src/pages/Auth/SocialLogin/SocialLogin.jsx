@@ -1,9 +1,12 @@
 import { useNavigate } from "react-router";
 import useAuth from "../../../hooks/useAuth";
+import useAxios from "../../../hooks/useAxios";
+import Swal from "sweetalert2";
 
 const SocialLogin = ({ from }) => {
   const { signInWithGoogle } = useAuth();
   const navigate = useNavigate();
+  const axiosInstance = useAxios();
 
   // Handle Google Sign In
   const handleGoogleSignIn = () => {
@@ -19,15 +22,15 @@ const SocialLogin = ({ from }) => {
           last_log_in: new Date().toISOString(),
         };
 
-        // const userRes = await axiosInstance.post("/users", userInfo);
-        // console.log(userRes.data);
-        console.log(userInfo);
-
+        await axiosInstance.post("/users", userInfo);
         const redirectTo = from ? from : "/";
         navigate(redirectTo);
       })
       .catch((err) => {
-        console.log(err.code);
+        if (err.response.data) {
+          const redirectTo = from ? from : "/";
+          navigate(redirectTo);
+        }
       });
   };
   return (

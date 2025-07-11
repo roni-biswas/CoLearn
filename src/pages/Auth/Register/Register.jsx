@@ -10,10 +10,12 @@ import useAuth from "../../../hooks/useAuth";
 import uploadToCloudinary from "../../../services/uploadToCloudinary";
 import { useState } from "react";
 import SocialLogin from "../SocialLogin/SocialLogin";
+import useAxios from "../../../hooks/useAxios";
 
 const Register = () => {
   const { createUser, updateUserProfile } = useAuth();
   const navigate = useNavigate();
+  const axiosInstance = useAxios();
   const [preview, setPreview] = useState(null);
   const location = useLocation();
   const from = location.state?.from;
@@ -50,8 +52,7 @@ const Register = () => {
           last_log_in: new Date().toISOString(),
         };
 
-        // await axiosInstance.post("/users", userInfo);
-        console.log(userInfo);
+        await axiosInstance.post("/users", userInfo);
 
         // 5. Success
         Swal.fire("Success!", "Account created successfully", "success");

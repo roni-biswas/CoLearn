@@ -17,7 +17,6 @@ const navLinks = [
 
 const NavBar = () => {
   const { user, logOut } = useAuth();
-  console.log(user?.photoURL);
   const navigate = useNavigate();
   const [isSticky, setIsSticky] = useState(false);
   const [scrollDir, setScrollDir] = useState("up");
