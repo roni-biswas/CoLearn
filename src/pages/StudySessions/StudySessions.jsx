@@ -119,7 +119,7 @@ const StudySessions = () => {
                     </div>
                   </div>
                   <Link
-                    to={`/sessions/${session._id}`}
+                    to={`/session-details/${session._id}`}
                     className="btn btn-outline btn-sm text-primary hover:bg-primary hover:text-white transition-colors duration-300 mt-auto"
                   >
                     Read More

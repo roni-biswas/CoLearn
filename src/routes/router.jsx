@@ -17,6 +17,7 @@ import AllUsers from "../pages/Dashboard/Admin/AllUsers/AllUsers";
 import AdminSessions from "../pages/Dashboard/Admin/AdminSessions/AdminSessions";
 import AdminMaterials from "../pages/Dashboard/Admin/AdminMaterials/AdminMaterials";
 import StudySessions from "../pages/StudySessions/StudySessions";
+import SessionDetails from "../pages/StudySessions/SessionDetails";
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
       {
         path: "sessions",
         Component: StudySessions,
+      },
+      {
+        path: "session-details/:id",
+        Component: SessionDetails,
       },
     ],
   },
