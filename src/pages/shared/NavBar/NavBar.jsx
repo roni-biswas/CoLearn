@@ -13,6 +13,8 @@ const navLinks = [
   { name: "Home", path: "/" },
   { name: "Tutors", path: "/tutors" },
   { name: "Study Sessions", path: "/sessions" },
+  { name: "About Us", path: "/about" },
+  { name: "Contact Us", path: "/contact-us" },
 ];
 
 const NavBar = () => {
