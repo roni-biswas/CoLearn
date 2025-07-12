@@ -7,14 +7,15 @@ const axiosSecure = axios.create({
 });
 
 const useAxiosSecure = () => {
-  const { logOut } = useAuth();
+  const { user, logOut } = useAuth();
   const navigate = useNavigate();
 
   axiosSecure.interceptors.request.use(
     (config) => {
-      // config.headers.Authorization = `Bearer ${user.accessToken}`;
+      config.headers.Authorization = `Bearer ${user.accessToken}`;
       return config;
     },
+
     (error) => {
       return Promise.reject(error);
     }
