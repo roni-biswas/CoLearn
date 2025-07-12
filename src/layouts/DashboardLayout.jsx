@@ -14,6 +14,7 @@ import {
 import { FiMenu, FiShield } from "react-icons/fi";
 import { useState } from "react";
 import logo from "../assets/logo1.png";
+import DashboardTopMenu from "../pages/Dashboard/Shared/DashboardTopMenu";
 
 const activeClass = ({ isActive }) =>
   `flex items-center px-3 py-2 rounded-md transition-colors duration-200 text-sm font-medium shadow-sm ${
@@ -47,6 +48,7 @@ const DashboardLayout = () => {
           </button>
         </div>
         <div className="p-4">
+          <DashboardTopMenu />
           <Outlet />
         </div>
       </div>
