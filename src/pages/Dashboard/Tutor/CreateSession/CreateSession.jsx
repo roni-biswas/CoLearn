@@ -1,8 +1,11 @@
 import { useForm } from "react-hook-form";
 import useAuth from "../../../../hooks/useAuth";
+import Swal from "sweetalert2";
+import useAxiosSecure from "../../../../hooks/useAxiosSecure";
 
 const CreateSession = () => {
   const { user } = useAuth();
+  const axiosSecure = useAxiosSecure();
 
   const {
     register,
@@ -11,25 +14,43 @@ const CreateSession = () => {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
-    const imageUrl = "image.jpg";
-    const newSession = {
-      ...data,
-      tutorName: user?.displayName,
-      tutorEmail: user?.email,
-      registrationStartDate: new Date(data.registrationStartDate).toISOString(),
-      registrationEndDate: new Date(data.registrationEndDate).toISOString(),
-      classStartDate: new Date(data.classStartDate).toISOString(),
-      classEndDate: new Date(data.classEndDate).toISOString(),
-      registrationFee: 0,
-      bannerImage: imageUrl,
-      status: "pending",
-      createdAt: new Date().toISOString(),
-    };
+  const onSubmit = async (data) => {
+    try {
+      const newSession = {
+        ...data,
+        tutorName: user?.displayName,
+        tutorEmail: user?.email,
+        registrationStartDate: new Date(
+          data.registrationStartDate
+        ).toISOString(),
+        registrationEndDate: new Date(data.registrationEndDate).toISOString(),
+        classStartDate: new Date(data.classStartDate).toISOString(),
+        classEndDate: new Date(data.classEndDate).toISOString(),
+        registrationFee: 0,
+        status: "pending",
+        createdAt: new Date().toISOString(),
+      };
 
-    console.log("New Session:", newSession);
-    // Send newSession to your backend via Axios
-    reset();
+      const res = await axiosSecure.post("/sessions", newSession);
+      if (res.data.sessionId) {
+        Swal.fire({
+          title: "Study Session Created",
+          text: "Your session has been submitted successfully and is pending approval.",
+          icon: "success",
+          confirmButtonText: "OK",
+          background: "#f0f9ff",
+        });
+        reset();
+      }
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        title: "Error",
+        text: "Failed to create session. Please try again.",
+        icon: "error",
+        confirmButtonText: "Close",
+      });
+    }
   };
 
   return (
@@ -75,7 +96,7 @@ const CreateSession = () => {
               <label className="block font-medium mb-1">Tutor Name</label>
               <input
                 type="text"
-                value={user?.displayName}
+                defaultValue={user?.displayName}
                 readOnly
                 disabled
                 className="input input-bordered w-full bg-gray-100 dark:bg-gray-700"
@@ -85,7 +106,7 @@ const CreateSession = () => {
               <label className="block font-medium mb-1">Tutor Email</label>
               <input
                 type="email"
-                value={user?.email}
+                defaultValue={user?.email}
                 readOnly
                 disabled
                 className="input input-bordered w-full bg-gray-100 dark:bg-gray-700"
@@ -133,17 +154,26 @@ const CreateSession = () => {
             </div>
           </div>
 
-          {/* Duration */}
+          {/* Session Duration */}
           <div>
-            <label className="block font-medium mb-1">Session Duration</label>
+            <label className="block font-medium mb-1">
+              Session Duration (Months)
+            </label>
             <input
-              type="text"
-              {...register("sessionDuration", { required: true })}
-              placeholder="e.g. 4 weeks"
+              type="number"
+              min={1}
+              {...register("sessionDuration", {
+                required: true,
+                min: 1,
+                valueAsNumber: true,
+              })}
+              placeholder="e.g. 2 (in months)"
               className="input input-bordered w-full dark:bg-gray-800"
             />
             {errors.sessionDuration && (
-              <p className="text-red-500 text-sm">Duration is required</p>
+              <p className="text-red-500 text-sm">
+                Duration (months) is required
+              </p>
             )}
           </div>
 
@@ -161,22 +191,6 @@ const CreateSession = () => {
 
           {/* Hidden Status */}
           <input type="hidden" value="pending" {...register("status")} />
-
-          {/* Banner Image Upload */}
-          <div>
-            <label className="block font-medium mb-1">
-              Session Banner Image
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              {...register("bannerImage", { required: true })}
-              className="file-input file-input-bordered w-full dark:bg-gray-800"
-            />
-            {errors.bannerImage && (
-              <p className="text-red-500 text-sm">Banner image is required</p>
-            )}
-          </div>
 
           {/* Submit Button */}
           <div className="pt-4">
