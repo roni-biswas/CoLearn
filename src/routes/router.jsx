@@ -23,6 +23,7 @@ import TutorDetails from "../pages/Tutors/TutorDetails";
 import About from "../pages/About/About";
 import Contact from "../pages/Contact/Contact";
 import MakeAdmin from "../pages/Dashboard/Admin/MakeAdmin/MakeAdmin";
+import PrivateRoute from "./PrivateRoute";
 
 const router = createBrowserRouter([
   {
@@ -76,7 +77,11 @@ const router = createBrowserRouter([
   },
   {
     path: "dashboard",
-    Component: DashboardLayout,
+    element: (
+      <PrivateRoute>
+        <DashboardLayout />
+      </PrivateRoute>
+    ),
     children: [
       {
         path: "booked-sessions",
