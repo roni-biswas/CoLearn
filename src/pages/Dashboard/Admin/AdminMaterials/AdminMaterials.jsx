@@ -11,7 +11,7 @@ const AdminMaterials = () => {
   const { data: materials = [], isLoading } = useQuery({
     queryKey: ["all-materials"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/materials");
+      const res = await axiosSecure.get("/admin/materials");
       return res.data;
     },
   });
@@ -62,7 +62,6 @@ const AdminMaterials = () => {
               <tr>
                 <th>#</th>
                 <th>Title</th>
-                <th>Session ID</th>
                 <th>Tutor Email</th>
                 <th>Image</th>
                 <th>Drive Link</th>
@@ -74,7 +73,6 @@ const AdminMaterials = () => {
                 <tr key={item._id}>
                   <td>{index + 1}</td>
                   <td className="font-medium">{item.title}</td>
-                  <td>{item.session_id}</td>
                   <td>{item.tutor_email}</td>
                   <td>
                     <img

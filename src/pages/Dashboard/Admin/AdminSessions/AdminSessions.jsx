@@ -1,20 +1,35 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Swal from "sweetalert2";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import useAxiosSecure from "../../../../hooks/useAxiosSecure";
 import Loading from "../../../../components/Loading";
 
 const AdminSessions = () => {
   const axiosSecure = useAxiosSecure();
   const queryClient = useQueryClient();
+
+  const sessionModalRef = useRef(null);
+  const updateModalRef = useRef(null);
+  const viewModalRef = useRef(null); // <-- new ref for view modal
+
   const [selectedSession, setSelectedSession] = useState(null);
   const [actionType, setActionType] = useState(null); // "approve" or "reject"
   const [selectedSessionId, setSelectedSessionId] = useState(null);
+  const [viewSession, setViewSession] = useState(null); // <-- session to view
 
   const { data: sessions = [], isLoading } = useQuery({
     queryKey: ["admin-sessions"],
     queryFn: async () => {
       const res = await axiosSecure.get("/admin/sessions");
+      return res.data;
+    },
+  });
+
+  const { data: editingSession, isLoading: isEditLoading } = useQuery({
+    queryKey: ["session", selectedSessionId],
+    enabled: !!selectedSessionId,
+    queryFn: async () => {
+      const res = await axiosSecure.get(`/sessions/${selectedSessionId}`);
       return res.data;
     },
   });
@@ -26,15 +41,6 @@ const AdminSessions = () => {
     onSuccess: () => {
       Swal.fire("Approved", "Session approved successfully", "success");
       queryClient.invalidateQueries(["admin-sessions"]);
-    },
-  });
-
-  const { data: editingSession, isLoading: isEditLoading } = useQuery({
-    queryKey: ["session", selectedSessionId],
-    enabled: !!selectedSessionId,
-    queryFn: async () => {
-      const res = await axiosSecure.get(`/sessions/${selectedSessionId}`);
-      return res.data;
     },
   });
 
@@ -64,18 +70,18 @@ const AdminSessions = () => {
   const handleApprove = (session) => {
     setSelectedSession(session);
     setActionType("approve");
-    document.getElementById("session_modal").showModal();
+    sessionModalRef.current?.showModal();
   };
 
   const handleReject = (session) => {
     setSelectedSession(session);
     setActionType("reject");
-    document.getElementById("session_modal").showModal();
+    sessionModalRef.current?.showModal();
   };
 
   const handleUpdate = (sessionId) => {
     setSelectedSessionId(sessionId);
-    document.getElementById("update_modal").showModal();
+    updateModalRef.current?.showModal();
   };
 
   const handleDelete = (sessionId) => {
@@ -92,6 +98,12 @@ const AdminSessions = () => {
     });
   };
 
+  // NEW: open view details modal
+  const handleViewDetails = (session) => {
+    setViewSession(session);
+    viewModalRef.current?.showModal();
+  };
+
   const handleModalSubmit = (e) => {
     e.preventDefault();
     const form = e.target;
@@ -106,7 +118,7 @@ const AdminSessions = () => {
       rejectSession.mutate({ sessionId, reason, feedback });
     }
 
-    document.getElementById("session_modal").close();
+    closeSessionModal();
   };
 
   const handleSubmitUpdate = async (e) => {
@@ -117,8 +129,9 @@ const AdminSessions = () => {
       title: form.title.value,
       sessionDuration: parseInt(form.sessionDuration.value),
       classEndDate: form.classEndDate.value,
-      // Add other fields as needed
-      status: form.status.value, // <-- include this
+      fee: parseFloat(form.fee.value),
+      status: form.status.value,
+      // Add other fields here as needed
     };
 
     try {
@@ -131,13 +144,29 @@ const AdminSessions = () => {
         Swal.fire("Updated", "Session updated successfully", "success");
         queryClient.invalidateQueries(["admin-sessions"]);
         form.reset();
-        setSelectedSessionId(null);
-        document.getElementById("update_modal").close();
+        closeUpdateModal();
       }
     } catch (err) {
       console.error(err);
       Swal.fire("Error", "Failed to update session", "error");
     }
+  };
+
+  const closeSessionModal = () => {
+    setSelectedSession(null);
+    setActionType(null);
+    sessionModalRef.current?.close();
+  };
+
+  const closeUpdateModal = () => {
+    setSelectedSessionId(null);
+    updateModalRef.current?.close();
+  };
+
+  // NEW: close view modal
+  const closeViewModal = () => {
+    setViewSession(null);
+    viewModalRef.current?.close();
   };
 
   return (
@@ -165,13 +194,18 @@ const AdminSessions = () => {
                   <td>{session.title}</td>
                   <td className="capitalize">{session.status}</td>
                   <td>
-                    {session.registrationFee === 0 && session.fee === 0
-                      ? "Free"
-                      : session.fee >= 0
-                      ? session.fee
+                    {(session.fee ?? session.registrationFee) > 0
+                      ? `$${session.fee ?? session.registrationFee}`
                       : "Free"}
                   </td>
                   <td className="space-x-2">
+                    <button
+                      className="btn btn-xs btn-info"
+                      onClick={() => handleViewDetails(session)}
+                    >
+                      View Details
+                    </button>
+
                     {session.status === "pending" ? (
                       <>
                         <button
@@ -187,39 +221,35 @@ const AdminSessions = () => {
                           Reject
                         </button>
                       </>
+                    ) : session.status === "approved" ? (
+                      <>
+                        <button
+                          className="btn btn-sm btn-primary mr-2"
+                          onClick={() => handleUpdate(session._id)}
+                        >
+                          Update
+                        </button>
+                        <button
+                          className="btn btn-sm btn-error"
+                          onClick={() => handleDelete(session._id)}
+                        >
+                          Delete
+                        </button>
+                      </>
                     ) : (
                       <>
-                        {session.status === "approved" ? (
-                          <>
-                            <button
-                              className="btn btn-sm btn-primary mr-2"
-                              onClick={() => handleUpdate(session._id)}
-                            >
-                              Update
-                            </button>
-                            <button
-                              className="btn btn-sm btn-error"
-                              onClick={() => handleDelete(session._id)}
-                            >
-                              Delete
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                            <button
-                              className="btn btn-xs btn-success"
-                              onClick={() => handleApprove(session)}
-                            >
-                              Approve
-                            </button>
-                            <button
-                              className="btn btn-xs btn-error"
-                              onClick={() => handleReject(session)}
-                            >
-                              Reject
-                            </button>
-                          </>
-                        )}
+                        <button
+                          className="btn btn-xs btn-success"
+                          onClick={() => handleApprove(session)}
+                        >
+                          Approve
+                        </button>
+                        <button
+                          className="btn btn-xs btn-error"
+                          onClick={() => handleReject(session)}
+                        >
+                          Reject
+                        </button>
                       </>
                     )}
                   </td>
@@ -230,7 +260,8 @@ const AdminSessions = () => {
         </div>
       )}
 
-      <dialog id="update_modal" className="modal">
+      {/* Update Modal */}
+      <dialog id="update_modal" className="modal" ref={updateModalRef}>
         <div className="modal-box max-w-2xl">
           <h3 className="font-bold text-lg mb-4">Update Study Session</h3>
 
@@ -278,12 +309,29 @@ const AdminSessions = () => {
                   />
                 </div>
 
-                {/* Add more fields as needed */}
+                <div>
+                  <label className="block font-medium mb-1">
+                    Registration Fee
+                  </label>
+                  <select
+                    name="fee"
+                    className="select select-bordered w-full"
+                    defaultValue={editingSession?.fee || 0}
+                  >
+                    <option value={0}>Free</option>
+                    <option value={50}>$50</option>
+                    <option value={100}>$100</option>
+                    <option value={200}>$200</option>
+                    <option value={400}>$400</option>
+                    <option value={500}>$500</option>
+                  </select>
+                </div>
+
                 <div>
                   <label className="block font-medium mb-1">Status</label>
                   <select
                     name="status"
-                    defaultValue={selectedSession?.status}
+                    defaultValue={editingSession?.status || "approved"}
                     className="select select-bordered w-full"
                   >
                     <option value="approved">Approved</option>
@@ -293,16 +341,17 @@ const AdminSessions = () => {
               </div>
 
               <div className="modal-action mt-4">
-                <button type="submit" className="btn btn-primary">
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={approveSession.isLoading}
+                >
                   Save
                 </button>
                 <button
                   type="button"
                   className="btn"
-                  onClick={() => {
-                    setSelectedSessionId(null);
-                    document.getElementById("update_modal").close();
-                  }}
+                  onClick={closeUpdateModal}
                 >
                   Cancel
                 </button>
@@ -312,14 +361,17 @@ const AdminSessions = () => {
             <p className="text-red-500">Failed to load session data</p>
           )}
         </div>
-
-        <form method="dialog" className="modal-backdrop">
+        <form
+          method="dialog"
+          className="modal-backdrop"
+          onClick={closeUpdateModal}
+        >
           <button>close</button>
         </form>
       </dialog>
 
-      {/* Modal for approve or reject */}
-      <dialog id="session_modal" className="modal">
+      {/* Approve/Reject Modal */}
+      <dialog id="session_modal" className="modal" ref={sessionModalRef}>
         <div className="modal-box">
           <h3 className="font-bold text-lg mb-4">
             {actionType === "approve" ? "Approve Session" : "Reject Session"}
@@ -341,7 +393,6 @@ const AdminSessions = () => {
                   <option value={200}>$200</option>
                   <option value={400}>$400</option>
                   <option value={500}>$500</option>
-                  {/* Add more price options if needed */}
                 </select>
               </>
             ) : (
@@ -363,20 +414,77 @@ const AdminSessions = () => {
               </>
             )}
             <div className="modal-action">
-              <button type="submit" className="btn btn-primary">
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={approveSession.isLoading || rejectSession.isLoading}
+              >
                 Submit
               </button>
-              <button
-                type="button"
-                className="btn"
-                onClick={() => document.getElementById("session_modal").close()}
-              >
+              <button type="button" className="btn" onClick={closeSessionModal}>
                 Cancel
               </button>
             </div>
           </form>
         </div>
-        <form method="dialog" className="modal-backdrop">
+        <form
+          method="dialog"
+          className="modal-backdrop"
+          onClick={closeSessionModal}
+        >
+          <button>close</button>
+        </form>
+      </dialog>
+
+      {/* View Details Modal */}
+      <dialog id="view_modal" className="modal" ref={viewModalRef}>
+        <div className="modal-box max-w-3xl max-h-[80vh] overflow-y-auto">
+          <h3 className="font-bold text-lg mb-4">Session Details</h3>
+
+          {viewSession ? (
+            <div className="space-y-3 text-sm">
+              {Object.entries(viewSession)
+                .filter(([key]) => key !== "_id")
+                .map(([key, value]) => {
+                  // Check if value is date string or Date object
+                  let displayValue = value;
+                  if (typeof value === "string" || value instanceof Date) {
+                    const date = new Date(value);
+                    if (!isNaN(date.getTime())) {
+                      displayValue = date.toLocaleString();
+                    }
+                  } else if (typeof value === "object") {
+                    // For objects, stringify prettily
+                    displayValue = JSON.stringify(value, null, 2);
+                  }
+
+                  return (
+                    <div key={key} className="flex">
+                      <strong className="w-48 capitalize">
+                        {key.replace(/([A-Z])/g, " $1")}:
+                      </strong>
+                      <span className="break-words whitespace-pre-wrap">
+                        {displayValue}
+                      </span>
+                    </div>
+                  );
+                })}
+            </div>
+          ) : (
+            <p>No session data available</p>
+          )}
+
+          <div className="modal-action mt-6">
+            <button className="btn" onClick={closeViewModal}>
+              Close
+            </button>
+          </div>
+        </div>
+        <form
+          method="dialog"
+          className="modal-backdrop"
+          onClick={closeViewModal}
+        >
           <button>close</button>
         </form>
       </dialog>
