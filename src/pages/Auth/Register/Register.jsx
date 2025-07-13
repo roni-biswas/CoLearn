@@ -46,6 +46,7 @@ const Register = () => {
 
         // 4. Send to your backend
         const userInfo = {
+          name,
           email,
           role: "student", // default
           created_at: new Date().toISOString(),

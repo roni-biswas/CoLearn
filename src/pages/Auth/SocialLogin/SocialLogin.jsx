@@ -16,6 +16,7 @@ const SocialLogin = ({ from }) => {
         const user = result.user;
 
         const userInfo = {
+          name: user?.displayName,
           email: user?.email,
           role: "student", // by default
           created_at: new Date().toISOString(),
