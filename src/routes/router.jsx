@@ -22,8 +22,11 @@ import Tutors from "../pages/Tutors/Tutors";
 import TutorDetails from "../pages/Tutors/TutorDetails";
 import About from "../pages/About/About";
 import Contact from "../pages/Contact/Contact";
-import MakeAdmin from "../pages/Dashboard/Admin/MakeAdmin/MakeAdmin";
 import PrivateRoute from "./PrivateRoute";
+import Forbidden from "../pages/Error/Forbidden";
+import AdminRoute from "./AdminRoute";
+import TutorRoute from "./TutorRoute";
+import StudentRoute from "./StudentRoute";
 
 const router = createBrowserRouter([
   {
@@ -58,6 +61,10 @@ const router = createBrowserRouter([
         path: "contact-us",
         Component: Contact,
       },
+      {
+        path: "forbidden",
+        Component: Forbidden,
+      },
     ],
   },
   // auth related routes
@@ -83,53 +90,94 @@ const router = createBrowserRouter([
       </PrivateRoute>
     ),
     children: [
+      /* Student only */
       {
         path: "booked-sessions",
-        element: <BookedSessions />,
+        element: (
+          <StudentRoute>
+            <BookedSessions />
+          </StudentRoute>
+        ),
       },
       {
         path: "create-note",
-        element: <CreateNote />,
+        element: (
+          <StudentRoute>
+            <CreateNote />
+          </StudentRoute>
+        ),
       },
       {
         path: "manage-notes",
-        element: <ManageNotes />,
+        element: (
+          <StudentRoute>
+            <ManageNotes />
+          </StudentRoute>
+        ),
       },
       {
         path: "study-materials",
-        element: <StudyMaterials />,
+        element: (
+          <StudentRoute>
+            <StudyMaterials />
+          </StudentRoute>
+        ),
       },
       {
         path: "create-session",
-        element: <CreateSession />,
+        element: (
+          <TutorRoute>
+            <CreateSession />
+          </TutorRoute>
+        ),
       },
       {
         path: "all-sessions",
-        element: <AllSessions />,
+        element: (
+          <TutorRoute>
+            <AllSessions />
+          </TutorRoute>
+        ),
       },
       {
         path: "upload-materials",
-        element: <UploadMaterials />,
+        element: (
+          <TutorRoute>
+            <UploadMaterials />
+          </TutorRoute>
+        ),
       },
       {
         path: "all-materials",
-        element: <AllMaterials />,
+        element: (
+          <TutorRoute>
+            <AllMaterials />
+          </TutorRoute>
+        ),
       },
       {
         path: "all-users",
-        element: <AllUsers />,
+        element: (
+          <AdminRoute>
+            <AllUsers />
+          </AdminRoute>
+        ),
       },
       {
         path: "admin-sessions",
-        element: <AdminSessions />,
+        element: (
+          <AdminRoute>
+            <AdminSessions />
+          </AdminRoute>
+        ),
       },
       {
         path: "admin-materials",
-        element: <AdminMaterials />,
-      },
-      {
-        path: "make-admin",
-        element: <MakeAdmin />,
+        element: (
+          <AdminRoute>
+            <AdminMaterials />
+          </AdminRoute>
+        ),
       },
     ],
   },
