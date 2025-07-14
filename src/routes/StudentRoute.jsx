@@ -11,7 +11,7 @@ const StudentRoute = ({ children }) => {
   if (loading || isRoleLoading) return <Loading />;
   if (user && role === "student") return children;
 
-  return <Navigate to="/forbidden" state={{ from: location }} replace />;
+  return <Navigate to="/forbidden" state={{ from: location?.pathname }} />;
 };
 
 export default StudentRoute;

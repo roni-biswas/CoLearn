@@ -8,13 +8,6 @@ import img2 from "../../../assets/banner/stack2.jpg";
 import img3 from "../../../assets/banner/stack3.jpg";
 import img4 from "../../../assets/banner/stack4.jpg";
 
-const images = [
-  { src: img1, alt: "Study group" },
-  { src: img2, alt: "Reading" },
-  { src: img3, alt: "Writing notes" },
-  { src: img4, alt: "Student with book" },
-];
-
 const Banner = () => {
   return (
     <section
@@ -44,7 +37,7 @@ const Banner = () => {
               </p>
               <div className="flex justify-center lg:justify-start">
                 <Link
-                  to="/sessions"
+                  to="/study-sessions"
                   className="btn btn-secondary text-white px-6 py-3 rounded-lg shadow-lg hover:scale-105 transition-transform duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-primary"
                 >
                   Get Started

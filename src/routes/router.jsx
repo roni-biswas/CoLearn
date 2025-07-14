@@ -26,6 +26,7 @@ import Forbidden from "../pages/Error/Forbidden";
 import AdminRoute from "./AdminRoute";
 import TutorRoute from "./TutorRoute";
 import StudentRoute from "./StudentRoute";
+import DynamicDashboard from "../pages/Dashboard/Shared/DynamicDashboard";
 
 const router = createBrowserRouter([
   {
@@ -85,6 +86,14 @@ const router = createBrowserRouter([
       </PrivateRoute>
     ),
     children: [
+      {
+        index: true,
+        element: (
+          <PrivateRoute>
+            <DynamicDashboard />
+          </PrivateRoute>
+        ),
+      },
       /* Student only */
       {
         path: "booked-sessions",

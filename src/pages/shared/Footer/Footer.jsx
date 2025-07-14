@@ -8,13 +8,11 @@ import {
 } from "react-icons/fa";
 import logo from "../../../assets/logo1.png"; // Replace with your actual logo path
 
-const categories = [
-  "Programming",
-  "Mathematics",
-  "Language Learning",
-  "Science",
-  "Design",
-  "Test Prep",
+const navLinks = [
+  { name: "About", href: "/about" },
+  { name: "Tutors", href: "/tutors" },
+  { name: "Sessions", href: "/sessions" },
+  { name: "Contact", href: "/contact" },
 ];
 
 const Footer = () => {
@@ -32,21 +30,19 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* Categories */}
+          {/*  Links */}
           <div>
             <h3 className="text-lg font-semibold text-white mb-6">
-              Popular Categories
+              CoLearn Links
             </h3>
             <ul className="space-y-3">
-              {categories.map((cat, idx) => (
+              {navLinks.map((link, idx) => (
                 <li key={idx}>
                   <a
-                    href={`/categories/${cat
-                      .toLowerCase()
-                      .replace(/\s+/g, "-")}`}
+                    href={link.href}
                     className="hover:text-primary transition-colors duration-200"
                   >
-                    {cat}
+                    {link.name}
                   </a>
                 </li>
               ))}
