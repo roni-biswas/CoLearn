@@ -30,7 +30,7 @@ const BookedSessions = () => {
     const form = e.target;
 
     const reviewData = {
-      session_id: selectedSession?._id,
+      session_id: selectedSession?.studySession?._id,
       student_email: user.email,
       student_name: user.displayName || "Anonymous",
       rating: parseFloat(form.rating.value),
@@ -75,11 +75,13 @@ const BookedSessions = () => {
                 sessions.map((session, idx) => (
                   <tr key={session._id}>
                     <td>{idx + 1}</td>
-                    <td>{session.title}</td>
-                    <td>{session.tutorName}</td>
-                    <td>{session.sessionDuration} month(s)</td>
+                    <td>{session.studySession?.title}</td>
+                    <td>{session.studySession?.tutorName}</td>
+                    <td>{session.studySession?.sessionDuration} month(s)</td>
                     <td>
-                      {new Date(session.classEndDate).toLocaleDateString()}
+                      {new Date(
+                        session.studySession?.classEndDate
+                      ).toLocaleDateString()}
                     </td>
                     <td>
                       <button
@@ -106,25 +108,30 @@ const BookedSessions = () => {
         </div>
       )}
 
-      {/* Modal for session details and review */}
+      {/* Modal for session details, actions and review */}
       <dialog id="detail_modal" className="modal">
-        <div className="modal-box max-w-2xl">
-          <h3 className="font-bold text-xl mb-2">{selectedSession?.title}</h3>
+        <div className="modal-box max-w-2xl space-y-4">
+          <h3 className="font-bold text-xl">
+            {selectedSession?.studySession?.title}
+          </h3>
           <p>
-            <strong>Tutor:</strong> {selectedSession?.tutorName}
+            <strong>Tutor:</strong> {selectedSession?.studySession?.tutorName}
           </p>
           <p>
-            <strong>Duration:</strong> {selectedSession?.sessionDuration}{" "}
-            month(s)
+            <strong>Duration:</strong>{" "}
+            {selectedSession?.studySession?.sessionDuration} month(s)
           </p>
           <p>
             <strong>Class End:</strong>{" "}
-            {new Date(selectedSession?.classEndDate).toLocaleDateString()}
+            {new Date(
+              selectedSession?.studySession?.classEndDate
+            ).toLocaleDateString()}
           </p>
-          <p className="mt-2">{selectedSession?.description}</p>
+          <p className="mt-2">{selectedSession?.studySession?.description}</p>
 
-          <hr className="my-4" />
+          <hr />
 
+          {/* Review Form */}
           <form onSubmit={handleReviewSubmit} className="space-y-3">
             <h4 className="text-lg font-semibold">Leave a Review</h4>
             <div>
@@ -164,7 +171,7 @@ const BookedSessions = () => {
         </div>
 
         <form method="dialog" className="modal-backdrop">
-          <button>close</button>
+          <button className="btn btn-ghost">Close</button>
         </form>
       </dialog>
     </div>

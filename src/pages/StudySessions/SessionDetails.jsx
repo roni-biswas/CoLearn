@@ -26,7 +26,6 @@ const SessionDetails = () => {
   const axiosSecure = useAxiosSecure();
   const { role } = useUserRole();
 
-  // Fetch session details
   const { data: session, isLoading: sessionLoading } = useQuery({
     queryKey: ["session-details", id],
     queryFn: async () => {
@@ -35,7 +34,6 @@ const SessionDetails = () => {
     },
   });
 
-  // Check if already booked
   const { data: isBooked, isLoading: bookingCheckLoading } = useQuery({
     queryKey: ["is-booked", id, user?.email],
     enabled: !!user?.email && !!id,
@@ -85,8 +83,6 @@ const SessionDetails = () => {
     !registrationOpen ||
     isBooked;
 
-  const filteredReviews = reviews.filter((r) => r.sessionId === _id);
-
   const handleBooking = async () => {
     if (!user) {
       return Swal.fire("Please login first to book a session");
@@ -125,6 +121,7 @@ const SessionDetails = () => {
 
       <Container>
         <div className="space-y-10 py-10 text-gray-800 dark:text-gray-100">
+          {/* Header */}
           <div className="bg-base-200 dark:bg-base-300 rounded-xl p-6 shadow-md">
             <h2 className="text-3xl font-bold mb-2">{title}</h2>
             <p className="mb-1">
@@ -133,12 +130,13 @@ const SessionDetails = () => {
             </p>
             <p>
               <strong className="text-primary">Rating:</strong>{" "}
-              {averageRating
+              {averageRating !== null
                 ? `${averageRating.toFixed(1)} ★`
                 : "No ratings yet"}
             </p>
           </div>
 
+          {/* Description */}
           <div className="bg-base-100 dark:bg-neutral rounded-xl p-6 shadow-md">
             <h3 className="text-2xl font-semibold mb-2 text-secondary">
               Description
@@ -148,6 +146,7 @@ const SessionDetails = () => {
             </p>
           </div>
 
+          {/* Dates & Fee */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="bg-base-200 dark:bg-base-300 rounded-xl p-5 shadow-sm space-y-2">
               <p>
@@ -175,18 +174,19 @@ const SessionDetails = () => {
                 <strong>Class End Date:</strong> {formatDate(classEndDate)}
               </p>
               <p>
-                <strong>Duration:</strong> {sessionDuration || "N/A"}
+                <strong>Duration:</strong> {sessionDuration || "N/A"} days
               </p>
             </div>
           </div>
 
+          {/* Reviews */}
           <div className="bg-base-100 dark:bg-neutral rounded-xl p-6 shadow-md">
             <h3 className="text-2xl font-semibold text-secondary mb-4">
               Student Reviews
             </h3>
-            {filteredReviews.length > 0 ? (
+            {reviews.length > 0 ? (
               <ul className="space-y-4">
-                {filteredReviews.map((review, idx) => (
+                {reviews.map((review, idx) => (
                   <li
                     key={idx}
                     className="bg-base-200 dark:bg-base-300 p-4 rounded-lg border border-base-300 dark:border-base-100"
@@ -200,7 +200,10 @@ const SessionDetails = () => {
                         ({review.rating.toFixed(1)})
                       </span>
                     </p>
-                    <p>{review.comment}</p>
+                    <p className="text-sm italic text-gray-500">
+                      {review.createdAt ? formatDate(review.createdAt) : ""}
+                    </p>
+                    <p className="mt-1">{review.comment}</p>
                   </li>
                 ))}
               </ul>
@@ -209,6 +212,7 @@ const SessionDetails = () => {
             )}
           </div>
 
+          {/* Booking Button */}
           <div className="text-center pt-4">
             {registrationOpen ? (
               <button
