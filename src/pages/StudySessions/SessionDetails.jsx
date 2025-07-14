@@ -1,55 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useParams, useNavigate } from "react-router";
 import Swal from "sweetalert2";
+import { useQuery } from "@tanstack/react-query";
 import PageHero from "../../components/PageHero";
 import Container from "../../components/Container";
 import heroImg from "../../assets/page-hero.jpg";
 import useAuth from "../../hooks/useAuth";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import useUserRole from "../../hooks/useUserRole";
+import Loading from "../../components/Loading";
 
-// Dummy role hook (replace with your real useUserRole)
-const useUserRole = () => {
-  // Try "student", "admin", "tutor" for testing:
-  const [role] = useState("student");
-  return [role];
-};
-
-const demoSession = {
-  _id: "s123",
-  title: "Mastering React for Beginners",
-  tutorName: "Jane Doe",
-  tutorEmail: "jane.doe@example.com",
-  averageRating: 4.6,
-  description:
-    "This session introduces the fundamentals of React, including component structure, state management, and hooks. Perfect for beginners aiming to build strong front-end skills.",
-  registrationStartDate: "2025-07-01",
-  registrationEndDate: "2025-07-15",
-  classStartTime: "14:00:00",
-  classEndDate: "2025-08-10",
-  sessionDuration: "5 Weeks",
-  registrationFee: 20, // set 0 for free session
-  reviews: [
-    {
-      sessionId: "s123",
-      studentName: "Alex Johnson",
-      rating: 5,
-      comment: "Amazing session! The tutor explained everything clearly.",
-    },
-    {
-      sessionId: "s123",
-      studentName: "Samiya Rahman",
-      rating: 4.2,
-      comment: "Very helpful for understanding the basics of React.",
-    },
-    {
-      sessionId: "s999",
-      studentName: "Other User",
-      rating: 3,
-      comment: "Review for another session (should not show here).",
-    },
-  ],
-};
-
-// Helpers to format date and time
 const formatDate = (dateStr) => {
   if (!dateStr) return "N/A";
   return new Date(dateStr).toLocaleDateString(undefined, {
@@ -59,26 +19,43 @@ const formatDate = (dateStr) => {
   });
 };
 
-const formatTime = (timeStr) => {
-  if (!timeStr) return "N/A";
-  const date = new Date(`1970-01-01T${timeStr}Z`);
-  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-};
-
 const SessionDetails = () => {
-  //   const { id } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
-
   const { user } = useAuth();
-  const [role] = useUserRole();
+  const axiosSecure = useAxiosSecure();
+  const { role } = useUserRole();
 
-  // Use demoSession directly or fetch by id in real app
-  const [session] = useState(demoSession);
+  // Fetch session details
+  const { data: session, isLoading: sessionLoading } = useQuery({
+    queryKey: ["session-details", id],
+    queryFn: async () => {
+      const res = await axiosSecure.get(`/study/sessions/${id}`);
+      return res.data;
+    },
+  });
 
-  // Filter reviews by session id
-  const filteredReviews = session.reviews.filter(
-    (r) => r.sessionId === session._id
-  );
+  // Check if already booked
+  const { data: isBooked, isLoading: bookingCheckLoading } = useQuery({
+    queryKey: ["is-booked", id, user?.email],
+    enabled: !!user?.email && !!id,
+    queryFn: async () => {
+      const res = await axiosSecure.get(
+        `/bookedSessions/check?sessionId=${id}&email=${user.email}`
+      );
+      return res.data?.booked;
+    },
+  });
+
+  if (sessionLoading || bookingCheckLoading) {
+    return (
+      <div className="min-h-screen flex justify-center mt-24 bg-base-100 dark:bg-gray-900">
+        <Loading />
+      </div>
+    );
+  }
+
+  if (!session) return <p className="text-center py-20">Session not found.</p>;
 
   const {
     title,
@@ -88,42 +65,48 @@ const SessionDetails = () => {
     description,
     registrationStartDate,
     registrationEndDate,
-    classStartTime,
+    classStartDate,
     classEndDate,
     sessionDuration,
     registrationFee,
+    fee,
+    _id,
+    reviews = [],
   } = session;
 
   const now = new Date();
   const regEnd = new Date(registrationEndDate);
   const registrationOpen = now <= regEnd;
 
-  // Disable booking button if not logged in or role admin/tutor or registration closed
   const isDisabled =
-    !user || role === "admin" || role === "tutor" || !registrationOpen;
+    !user ||
+    role === "admin" ||
+    role === "tutor" ||
+    !registrationOpen ||
+    isBooked;
 
-  // Booking handler
+  const filteredReviews = reviews.filter((r) => r.sessionId === _id);
+
   const handleBooking = async () => {
     if (!user) {
       return Swal.fire("Please login first to book a session");
     }
 
     if (registrationFee > 0) {
-      // Redirect to payment page with session id
-      navigate(`/payment?sessionId=${session._id}`);
+      navigate(`/payment?sessionId=${_id}`);
     } else {
-      // Free booking: simulate API call to save booked session
       try {
-        // Simulate API call delay
-        await new Promise((r) => setTimeout(r, 1000));
-
-        // Here you would POST to /api/bookedSession with user.email, session._id, tutorEmail etc.
-
+        await axiosSecure.post("/bookedSessions", {
+          sessionId: _id,
+          studentEmail: user.email,
+          tutorEmail,
+        });
         Swal.fire(
           "Success!",
           "Your free session has been booked successfully.",
           "success"
         );
+        navigate("/study-sessions");
       } catch (err) {
         console.error(err);
         Swal.fire("Booking failed", "Please try again later.", "error");
@@ -136,13 +119,12 @@ const SessionDetails = () => {
       <PageHero
         title="Session Details"
         redirectText="Back to Sessions"
-        redirectLink="/sessions"
+        redirectLink="/study-sessions"
         heroBg={heroImg}
       />
 
       <Container>
         <div className="space-y-10 py-10 text-gray-800 dark:text-gray-100">
-          {/* Title and Summary */}
           <div className="bg-base-200 dark:bg-base-300 rounded-xl p-6 shadow-md">
             <h2 className="text-3xl font-bold mb-2">{title}</h2>
             <p className="mb-1">
@@ -157,7 +139,6 @@ const SessionDetails = () => {
             </p>
           </div>
 
-          {/* Description */}
           <div className="bg-base-100 dark:bg-neutral rounded-xl p-6 shadow-md">
             <h3 className="text-2xl font-semibold mb-2 text-secondary">
               Description
@@ -167,7 +148,6 @@ const SessionDetails = () => {
             </p>
           </div>
 
-          {/* Info Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="bg-base-200 dark:bg-base-300 rounded-xl p-5 shadow-sm space-y-2">
               <p>
@@ -180,12 +160,16 @@ const SessionDetails = () => {
               </p>
               <p>
                 <strong>Fee:</strong>{" "}
-                {registrationFee ? `$${registrationFee.toFixed(2)}` : "Free"}
+                {registrationFee
+                  ? `$${registrationFee.toFixed(2)}`
+                  : fee > 0
+                  ? `$${fee.toFixed(2)}`
+                  : "Free"}
               </p>
             </div>
             <div className="bg-base-200 dark:bg-base-300 rounded-xl p-5 shadow-sm space-y-2">
               <p>
-                <strong>Class Start Time:</strong> {formatTime(classStartTime)}
+                <strong>Class Start Time:</strong> {formatDate(classStartDate)}
               </p>
               <p>
                 <strong>Class End Date:</strong> {formatDate(classEndDate)}
@@ -196,7 +180,6 @@ const SessionDetails = () => {
             </div>
           </div>
 
-          {/* Reviews */}
           <div className="bg-base-100 dark:bg-neutral rounded-xl p-6 shadow-md">
             <h3 className="text-2xl font-semibold text-secondary mb-4">
               Student Reviews
@@ -226,7 +209,6 @@ const SessionDetails = () => {
             )}
           </div>
 
-          {/* Book Now Button */}
           <div className="text-center pt-4">
             {registrationOpen ? (
               <button
@@ -239,7 +221,9 @@ const SessionDetails = () => {
                 }`}
               >
                 {user
-                  ? registrationFee > 0
+                  ? isBooked
+                    ? "Already Booked"
+                    : registrationFee > 0
                     ? "Pay & Book Now"
                     : "Book Now"
                   : "Login to Book"}

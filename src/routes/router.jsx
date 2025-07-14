@@ -46,7 +46,7 @@ const router = createBrowserRouter([
         Component: TutorDetails,
       },
       {
-        path: "sessions",
+        path: "study-sessions",
         Component: StudySessions,
       },
       {

@@ -12,7 +12,7 @@ import Swal from "sweetalert2";
 const navLinks = [
   { name: "Home", path: "/" },
   { name: "Tutors", path: "/tutors" },
-  { name: "Study Sessions", path: "/sessions" },
+  { name: "Study Sessions", path: "/study-sessions" },
   { name: "About Us", path: "/about" },
   { name: "Contact Us", path: "/contact-us" },
 ];

@@ -1,74 +1,48 @@
+import { useQuery } from "@tanstack/react-query";
 import { FaClock, FaBookOpen } from "react-icons/fa";
 import { Link } from "react-router";
+import { useState } from "react";
 import PageHero from "../../components/PageHero";
 import Container from "../../components/Container";
 import heroImg from "../../assets/page-hero.jpg";
-
-const demoSessions = [
-  {
-    _id: "1",
-    title: "JavaScript Essentials",
-    description:
-      "Understand the core concepts of JavaScript and how it works under the hood. You'll gain practical experience with syntax, functions, and scope.",
-    registrationStart: "2025-07-01T00:00:00Z",
-    registrationEnd: "2025-07-20T23:59:59Z",
-    status: "approved",
-  },
-  {
-    _id: "2",
-    title: "React Fundamentals",
-    description:
-      "Learn the basics of React including components, props, and hooks. A perfect session for beginners looking to build dynamic UIs.",
-    registrationStart: "2025-06-01T00:00:00Z",
-    registrationEnd: "2025-06-15T23:59:59Z",
-    status: "approved",
-  },
-  {
-    _id: "3",
-    title: "Node.js & Express API",
-    description:
-      "Build scalable server-side applications using Express.js and understand routing, middleware, and RESTful APIs.",
-    registrationStart: "2025-07-10T00:00:00Z",
-    registrationEnd: "2025-07-25T23:59:59Z",
-    status: "approved",
-  },
-  {
-    _id: "4",
-    title: "UI/UX Design Basics",
-    description:
-      "Learn the key principles of UI and UX design to improve your front-end development skills and create user-friendly interfaces.",
-    registrationStart: "2025-06-01T00:00:00Z",
-    registrationEnd: "2025-06-15T23:59:59Z",
-    status: "approved",
-  },
-  {
-    _id: "5",
-    title: "Database Design",
-    description:
-      "Master relational database design, normalization, and effective querying using SQL for scalable data storage solutions.",
-    registrationStart: "2025-07-05T00:00:00Z",
-    registrationEnd: "2025-07-22T23:59:59Z",
-    status: "approved",
-  },
-  {
-    _id: "6",
-    title: "Version Control with Git",
-    description:
-      "Understand Git basics, branching, merging, resolving conflicts, and managing remote repositories with GitHub.",
-    registrationStart: "2025-06-10T00:00:00Z",
-    registrationEnd: "2025-06-25T23:59:59Z",
-    status: "approved",
-  },
-];
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import Loading from "../../components/Loading";
 
 const StudySessions = () => {
+  const axiosSecure = useAxiosSecure();
   const currentDate = new Date();
+  const [currentPage, setCurrentPage] = useState(1);
+  const sessionsPerPage = 8;
 
-  const filteredSessions = demoSessions.filter((session) => {
-    const start = new Date(session.registrationStart);
-    const end = new Date(session.registrationEnd);
-    return session.status === "approved" && currentDate >= start;
+  const { data: sessions = [], isLoading } = useQuery({
+    queryKey: ["study-sessions"],
+    queryFn: async () => {
+      const res = await axiosSecure.get("/study/sessions");
+      return res.data;
+    },
   });
+
+  // Filter sessions by date
+  const filteredSessions = sessions.filter((session) => {
+    const start = new Date(session.registrationStartDate);
+    const end = new Date(session.registrationEndDate);
+    if (currentDate < start) return "Upcoming";
+    if (currentDate >= start && currentDate <= end) return "Ongoing";
+    return "Closed";
+  });
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredSessions.length / sessionsPerPage);
+  const paginatedSessions = filteredSessions.slice(
+    (currentPage - 1) * sessionsPerPage,
+    currentPage * sessionsPerPage
+  );
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-base-200">
@@ -85,49 +59,91 @@ const StudySessions = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredSessions.map((session) => {
-              const isClosed = currentDate > new Date(session.registrationEnd);
-              return (
-                <div
-                  key={session._id}
-                  className="bg-white dark:bg-gray-900 rounded-xl p-5 shadow-md hover:shadow-xl transition-all border border-base-300 flex flex-col justify-between h-full"
-                  data-aos="fade-up"
-                >
-                  <div>
-                    <h3 className="text-lg font-bold text-primary mb-2">
-                      {session.title}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-5">
-                      {session.description.slice(0, 170)}...
-                    </p>
-                    <div className="flex items-center justify-between text-sm mb-4">
-                      <span
-                        className={`inline-flex items-center gap-1 px-3 py-1 rounded-full font-medium text-xs ${
-                          isClosed
-                            ? "bg-red-100 text-red-600"
-                            : "bg-green-100 text-green-600"
-                        }`}
-                      >
-                        <FaClock />
-                        {isClosed ? "Closed" : "Ongoing"}
-                      </span>
-                      <span className="text-gray-400 text-xs">
-                        <FaBookOpen className="inline-block mr-1" />
-                        {new Date(session.registrationEnd).toLocaleDateString()}
-                      </span>
+          {isLoading ? (
+            <Loading />
+          ) : paginatedSessions.length === 0 ? (
+            <p className="text-center text-gray-500">No active sessions</p>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {paginatedSessions.map((session) => {
+                  const isClosed =
+                    currentDate > new Date(session.registrationEndDate);
+                  return (
+                    <div
+                      key={session._id}
+                      className="bg-white dark:bg-gray-900 rounded-xl p-5 shadow-md hover:shadow-xl transition-all border border-base-300 flex flex-col justify-between h-full"
+                      data-aos="fade-up"
+                    >
+                      <div className="flex-grow">
+                        <h3 className="text-lg font-bold text-primary mb-2">
+                          {session.title}
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-5">
+                          {session.description.slice(0, 170)}...
+                        </p>
+                      </div>
+                      <div className="mt-4">
+                        <div className="flex items-center justify-between text-sm mb-4">
+                          <span
+                            className={`inline-flex items-center gap-1 px-3 py-1 rounded-full font-medium text-xs ${
+                              isClosed
+                                ? "bg-red-100 text-red-600"
+                                : "bg-green-100 text-green-600"
+                            }`}
+                          >
+                            <FaClock />
+                            {isClosed ? "Closed" : "Ongoing"}
+                          </span>
+                          <span className="text-gray-400 text-xs">
+                            <FaBookOpen className="inline-block mr-1" />
+                            {new Date(
+                              session.registrationEndDate
+                            ).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <Link
+                          to={`/session-details/${session._id}`}
+                          className="btn btn-outline btn-sm w-full text-primary hover:bg-primary hover:text-white transition-colors duration-300"
+                        >
+                          Read More
+                        </Link>
+                      </div>
                     </div>
-                  </div>
-                  <Link
-                    to={`/session-details/${session._id}`}
-                    className="btn btn-outline btn-sm text-primary hover:bg-primary hover:text-white transition-colors duration-300 mt-auto"
+                  );
+                })}
+              </div>
+
+              {/* Pagination Controls */}
+              <div className="flex justify-center mt-10 gap-2">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="btn btn-sm"
+                >
+                  Prev
+                </button>
+                {[...Array(totalPages)].map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => handlePageChange(i + 1)}
+                    className={`btn btn-sm ${
+                      currentPage === i + 1 ? "btn-primary" : ""
+                    }`}
                   >
-                    Read More
-                  </Link>
-                </div>
-              );
-            })}
-          </div>
+                    {i + 1}
+                  </button>
+                ))}
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="btn btn-sm"
+                >
+                  Next
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </Container>
     </div>

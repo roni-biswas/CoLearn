@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Container from "../../../components/Container";
 import { Link } from "react-router";
 
-const StudySessions = () => {
+const AvailableStudySessions = () => {
   const [sessions, setSessions] = useState([]);
 
   useEffect(() => {
@@ -143,4 +143,4 @@ const StudySessions = () => {
   );
 };
 
-export default StudySessions;
+export default AvailableStudySessions;
