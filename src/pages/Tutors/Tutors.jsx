@@ -1,96 +1,59 @@
-import React from "react";
+import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import PageHero from "../../components/PageHero";
-import Container from "../../components/Container";
 import heroImg from "../../assets/page-hero.jpg";
+import TutorDetailsModal from "./TutorDetailsModal";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import Container from "../../components/Container";
+import Loading from "../../components/Loading";
 import TutorCard from "./TutorCard";
 
-// Demo data
-const demoTutors = [
-  {
-    id: 4,
-    tutorName: "Ahmed Karim",
-    tutorEmail: "ahmed.karim@example.com",
-    tutorImage: "https://i.pravatar.cc/100?u=ahmed",
-    averageRating: 4.8,
-    sessionTitle: "Data Structures & Algorithms Bootcamp",
-    sessionDescription:
-      "Master essential algorithms, time complexities, and problem-solving techniques using JavaScript.",
-    registrationFee: 45,
-    sessionDuration: "8 Weeks",
-    classEndDate: "2025-09-01",
-  },
-  {
-    id: 5,
-    tutorName: "Nazia Sultana",
-    tutorEmail: "nazia.dev@example.com",
-    tutorImage: "https://i.pravatar.cc/100?u=nazia",
-    averageRating: 4.6,
-    sessionTitle: "UI/UX Design with Figma",
-    sessionDescription:
-      "Learn modern UI/UX design with hands-on projects using Figma, design systems, and prototyping.",
-    registrationFee: 0,
-    sessionDuration: "6 Weeks",
-    classEndDate: "2025-08-28",
-  },
-  {
-    id: 6,
-    tutorName: "Rezaul Haque",
-    tutorEmail: "rezaul.haque@example.com",
-    tutorImage: "https://i.pravatar.cc/100?u=rezaul",
-    averageRating: 4.9,
-    sessionTitle: "Full Stack Web Development (MERN)",
-    sessionDescription:
-      "Build scalable web applications using MongoDB, Express, React, and Node.js.",
-    registrationFee: 60,
-    sessionDuration: "10 Weeks",
-    classEndDate: "2025-09-30",
-  },
-  {
-    id: 7,
-    tutorName: "Farzana Yeasmin",
-    tutorEmail: "farzana.yeasmin@example.com",
-    tutorImage: "https://i.pravatar.cc/100?u=farzana",
-    averageRating: 4.5,
-    sessionTitle: "Python for Data Science",
-    sessionDescription:
-      "Explore data manipulation, visualization, and machine learning using Python libraries like Pandas & scikit-learn.",
-    registrationFee: 0,
-    sessionDuration: "7 Weeks",
-    classEndDate: "2025-09-15",
-  },
-  {
-    id: 8,
-    tutorName: "Shamim Hossain",
-    tutorEmail: "shamim.hossain@example.com",
-    tutorImage: "https://i.pravatar.cc/100?u=shamim",
-    averageRating: 4.3,
-    sessionTitle: "Intro to Cloud Computing",
-    sessionDescription:
-      "Understand cloud fundamentals, deployment models, and hands-on with AWS basics.",
-    registrationFee: 25,
-    sessionDuration: "5 Weeks",
-    classEndDate: "2025-08-22",
-  },
-  {
-    id: 9,
-    tutorName: "Tasnim Jahan",
-    tutorEmail: "tasnim.jahan@example.com",
-    tutorImage: "https://i.pravatar.cc/100?u=tasnim",
-    averageRating: 4.7,
-    sessionTitle: "Mobile App Development with Flutter",
-    sessionDescription:
-      "Create cross-platform mobile apps with Flutter and Dart — from basics to deployment.",
-    registrationFee: 35,
-    sessionDuration: "6 Weeks",
-    classEndDate: "2025-09-10",
-  },
-];
-
 const Tutors = () => {
+  const axiosSecure = useAxiosSecure();
+  const [selectedSession, setSelectedSession] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const sessionsPerPage = 6;
+
+  const {
+    data: tutors = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["tutors"],
+    queryFn: async () => {
+      const res = await axiosSecure.get("/tutors-with-sessions");
+      return res.data;
+    },
+  });
+
+  // Flatten sessions from tutors and attach tutor info to each session
+  const allSessions = tutors.flatMap((tutor) =>
+    tutor.sessions.map((session) => ({
+      ...session,
+      tutorName: tutor.name,
+      tutorEmail: tutor.email,
+      averageRating: tutor.averageRating,
+    }))
+  );
+
+  const totalPages = Math.ceil(allSessions.length / sessionsPerPage);
+  const paginatedSessions = allSessions.slice(
+    (currentPage - 1) * sessionsPerPage,
+    currentPage * sessionsPerPage
+  );
+
+  const handleOpenModal = (session) => {
+    setSelectedSession(session);
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <div className="bg-gradient-to-br from-[#f4faff] via-white to-[#e7f0ff] dark:from-[#0f172a] dark:via-[#1e293b] dark:to-[#1e3a8a] min-h-screen">
       <PageHero title="Meet Our Expert Tutors" heroBg={heroImg} />
-
       <Container>
         <div className="py-12">
           <div className="text-center mb-10">
@@ -99,15 +62,92 @@ const Tutors = () => {
             </h2>
             <p className="mt-2 text-lg text-gray-600 dark:text-gray-300 max-w-xl mx-auto">
               Discover the minds behind your learning journey. Each tutor brings
-              a unique skill set and real-world experience to help you succeed.
+              real-world experience to help you succeed.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {demoTutors.map((tutor) => (
-              <TutorCard key={tutor.id} tutor={tutor} />
-            ))}
-          </div>
+          {isLoading ? (
+            <Loading />
+          ) : error ? (
+            <p className="text-center text-red-500">Failed to load tutors.</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {paginatedSessions.map((session) => (
+                <TutorCard
+                  key={session._id}
+                  tutor={{
+                    tutorName: session.tutorName,
+                    tutorEmail: session.tutorEmail,
+                    averageRating: session.averageRating,
+                    sessionTitle: session.title,
+                    sessionDescription: session.description,
+                    fee: session.registrationFee,
+                    sessionDuration: session.sessionDuration,
+                    classEndDate: session.classEndDate,
+                  }}
+                  onClick={() => handleOpenModal(session)}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <>
+              <p className="text-center mt-8 text-gray-700 dark:text-gray-300 font-medium">
+                Showing {paginatedSessions.length} of {allSessions.length}{" "}
+                sessions
+              </p>
+
+              <div className="flex justify-center mt-4 items-center gap-2 flex-wrap">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className={`px-4 py-2 rounded-md font-medium transition duration-300 ${
+                    currentPage === 1
+                      ? "bg-gray-300 dark:bg-gray-700 text-gray-500 cursor-not-allowed"
+                      : "bg-base-200 dark:bg-base-300 hover:bg-primary/20"
+                  }`}
+                >
+                  Prev
+                </button>
+
+                {Array.from({ length: totalPages }).map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => handlePageChange(idx + 1)}
+                    className={`px-4 py-2 rounded-md font-medium transition duration-300 ${
+                      currentPage === idx + 1
+                        ? "bg-primary text-white scale-105 shadow font-bold"
+                        : "bg-base-200 dark:bg-base-300 hover:bg-primary/20"
+                    }`}
+                  >
+                    {idx + 1}
+                  </button>
+                ))}
+
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className={`px-4 py-2 rounded-md font-medium transition duration-300 ${
+                    currentPage === totalPages
+                      ? "bg-gray-300 dark:bg-gray-700 text-gray-500 cursor-not-allowed"
+                      : "bg-base-200 dark:bg-base-300 hover:bg-primary/20"
+                  }`}
+                >
+                  Next
+                </button>
+              </div>
+            </>
+          )}
+
+          {/* Modal */}
+          {selectedSession && (
+            <TutorDetailsModal
+              tutor={selectedSession}
+              onClose={() => setSelectedSession(null)}
+            />
+          )}
         </div>
       </Container>
     </div>

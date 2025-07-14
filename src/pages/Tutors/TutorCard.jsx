@@ -1,92 +1,44 @@
-import { FaStar } from "react-icons/fa";
-import { motion } from "framer-motion";
-import { Link } from "react-router";
+import React from "react";
 
-const TutorCard = ({ tutor }) => {
+const TutorCard = ({ tutor, onClick }) => {
   const {
-    id,
     tutorName,
     sessionTitle,
-    averageRating,
     sessionDescription,
-    registrationFee,
+    fee,
     sessionDuration,
     classEndDate,
-    tutorImage,
   } = tutor;
 
-  const trimmedDescription =
-    sessionDescription.length > 100
-      ? sessionDescription.slice(0, 100) + "..."
-      : sessionDescription;
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      whileHover={{ scale: 1.02 }}
-      className="bg-white dark:bg-base-300 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 dark:border-gray-700 flex flex-col justify-between"
-    >
-      {/* Header Info */}
-      <div className="p-6 space-y-3 flex-1 flex flex-col justify-between">
-        {/* Tutor Info Inline */}
-        <div className="flex items-center gap-4 mb-2">
-          {tutorImage ? (
-            <img
-              src={tutorImage}
-              alt={tutorName}
-              className="w-12 h-12 rounded-full object-cover border border-gray-300 dark:border-gray-600"
-            />
-          ) : (
-            <div className="w-12 h-12 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-white font-bold">
-              {tutorName[0]}
-            </div>
-          )}
-          <div>
-            <p className="text-sm font-semibold text-primary">{tutorName}</p>
-            <div className="flex items-center gap-1 text-yellow-500 text-sm">
-              <FaStar />
-              {averageRating.toFixed(1)}
-            </div>
-          </div>
-        </div>
-
-        {/* Session Title */}
-        <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-1">
-          {sessionTitle}
-        </h3>
-
-        {/* Meta Info */}
-        <div className="text-sm space-y-1 text-gray-600 dark:text-gray-300">
-          <p>
-            <span className="font-medium text-secondary">Duration:</span>{" "}
-            {sessionDuration}
-          </p>
-          <p>
-            <span className="font-medium text-secondary">Ends:</span>{" "}
-            {classEndDate}
-          </p>
-          <p>
-            <span className="font-medium text-secondary">Fee:</span>{" "}
-            {registrationFee === 0 ? "Free" : `$${registrationFee}`}
-          </p>
-        </div>
-
-        {/* Description */}
-        <p className="text-sm text-gray-700 dark:text-gray-400 mt-2">
-          {trimmedDescription}
+    <div className="bg-white dark:bg-base-200 rounded-xl p-6 shadow-md hover:shadow-xl transition duration-300 flex flex-col justify-between min-h-[320px]">
+      <div>
+        <h3 className="text-xl font-bold text-primary mb-1">{sessionTitle}</h3>
+        <p className="text-sm text-gray-500 dark:text-gray-300 mb-1">
+          Tutor: <span className="font-medium">{tutorName}</span>
+        </p>
+        <p className="text-sm text-gray-500 dark:text-gray-300 mb-1">
+          Fee: {fee > 0 ? `$${fee}` : "Free"}
+        </p>
+        <p className="text-sm text-gray-500 dark:text-gray-300 mb-1">
+          Duration: {sessionDuration} month(s)
+        </p>
+        <p className="text-sm text-gray-500 dark:text-gray-300 mb-1">
+          Class End: {new Date(classEndDate).toLocaleDateString()}
+        </p>
+        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mt-2">
+          {sessionDescription}
         </p>
       </div>
-
-      {/* Footer Button */}
-      <div className="p-4 pt-0">
-        <Link to={`/tutor-details/${id}`} className="btn btn-primary w-full">
+      <div className="mt-4 text-end">
+        <button
+          onClick={onClick}
+          className="btn btn-sm btn-outline btn-primary"
+        >
           View Details
-        </Link>
+        </button>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

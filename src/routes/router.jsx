@@ -19,7 +19,6 @@ import AdminMaterials from "../pages/Dashboard/Admin/AdminMaterials/AdminMateria
 import StudySessions from "../pages/StudySessions/StudySessions";
 import SessionDetails from "../pages/StudySessions/SessionDetails";
 import Tutors from "../pages/Tutors/Tutors";
-import TutorDetails from "../pages/Tutors/TutorDetails";
 import About from "../pages/About/About";
 import Contact from "../pages/Contact/Contact";
 import PrivateRoute from "./PrivateRoute";
@@ -40,10 +39,6 @@ const router = createBrowserRouter([
       {
         path: "tutors",
         Component: Tutors,
-      },
-      {
-        path: "tutor-details/:id",
-        Component: TutorDetails,
       },
       {
         path: "study-sessions",
