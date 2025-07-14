@@ -36,30 +36,37 @@ const router = createBrowserRouter([
       {
         index: true,
         Component: Home,
+        handle: { title: "Home" },
       },
       {
         path: "tutors",
         Component: Tutors,
+        handle: { title: "Tutors" },
       },
       {
         path: "study-sessions",
         Component: StudySessions,
+        handle: { title: "Study Sessions" },
       },
       {
         path: "session-details/:id",
         Component: SessionDetails,
+        handle: { title: "Session details page" },
       },
       {
         path: "about",
         Component: About,
+        handle: { title: "About Us" },
       },
       {
         path: "contact-us",
         Component: Contact,
+        handle: { title: "Contact Us" },
       },
       {
         path: "forbidden",
         Component: Forbidden,
+        handle: { title: "Forbidden" },
       },
     ],
   },
@@ -71,10 +78,12 @@ const router = createBrowserRouter([
       {
         path: "login",
         Component: Login,
+        handle: { title: "Login your Account" },
       },
       {
         path: "register",
         Component: Register,
+        handle: { title: "Register" },
       },
     ],
   },
@@ -93,6 +102,7 @@ const router = createBrowserRouter([
             <DynamicDashboard />
           </PrivateRoute>
         ),
+        handle: { title: "Dashboard" },
       },
       /* Student only */
       {
@@ -102,6 +112,7 @@ const router = createBrowserRouter([
             <BookedSessions />
           </StudentRoute>
         ),
+        handle: { title: "View Booked Sessions" },
       },
       {
         path: "create-note",
@@ -110,6 +121,7 @@ const router = createBrowserRouter([
             <CreateNote />
           </StudentRoute>
         ),
+        handle: { title: "Create Note" },
       },
       {
         path: "manage-notes",
@@ -118,6 +130,7 @@ const router = createBrowserRouter([
             <ManageNotes />
           </StudentRoute>
         ),
+        handle: { title: "Manage Personal Notes" },
       },
       {
         path: "study-materials",
@@ -126,6 +139,7 @@ const router = createBrowserRouter([
             <StudyMaterials />
           </StudentRoute>
         ),
+        handle: { title: "View all Study Materials" },
       },
       {
         path: "create-session",
@@ -134,6 +148,7 @@ const router = createBrowserRouter([
             <CreateSession />
           </TutorRoute>
         ),
+        handle: { title: "Create Study Session" },
       },
       {
         path: "all-sessions",
@@ -142,6 +157,7 @@ const router = createBrowserRouter([
             <AllSessions />
           </TutorRoute>
         ),
+        handle: { title: "View all Study Sessions" },
       },
       {
         path: "upload-materials",
@@ -150,6 +166,7 @@ const router = createBrowserRouter([
             <UploadMaterials />
           </TutorRoute>
         ),
+        handle: { title: "Upload materials" },
       },
       {
         path: "all-materials",
@@ -158,6 +175,7 @@ const router = createBrowserRouter([
             <AllMaterials />
           </TutorRoute>
         ),
+        handle: { title: "View all Materials" },
       },
       {
         path: "all-users",
@@ -166,6 +184,7 @@ const router = createBrowserRouter([
             <AllUsers />
           </AdminRoute>
         ),
+        handle: { title: "All User Page" },
       },
       {
         path: "admin-sessions",
@@ -174,6 +193,7 @@ const router = createBrowserRouter([
             <AdminSessions />
           </AdminRoute>
         ),
+        handle: { title: "Admin Study Sessions" },
       },
       {
         path: "admin-materials",
@@ -182,6 +202,7 @@ const router = createBrowserRouter([
             <AdminMaterials />
           </AdminRoute>
         ),
+        handle: { title: "Admin Study Materials" },
       },
     ],
   },
