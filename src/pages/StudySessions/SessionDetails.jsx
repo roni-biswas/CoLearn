@@ -227,8 +227,8 @@ const SessionDetails = () => {
                 {user
                   ? isBooked
                     ? "Already Booked"
-                    : registrationFee > 0
-                    ? "Pay & Book Now"
+                    : fee > 0
+                    ? `Pay & Book Now $${fee}`
                     : "Book Now"
                   : "Login to Book"}
               </button>
