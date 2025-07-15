@@ -192,7 +192,7 @@ const SessionDetails = () => {
                     className="bg-base-200 dark:bg-base-300 p-4 rounded-lg border border-base-300 dark:border-base-100"
                   >
                     <p className="font-semibold">
-                      {review.studentName || "Anonymous"}
+                      {review.student_name || "Anonymous"}
                     </p>
                     <p className="text-yellow-500 text-sm mb-1">
                       {"★".repeat(Math.round(review.rating))}{" "}

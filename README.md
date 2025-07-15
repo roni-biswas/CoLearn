@@ -1,12 +1,69 @@
-# React + Vite
+# 🧠 Colearn – Collaborative Study Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Welcome to **Colearn**, a modern, fully-responsive, and professional collaborative study platform designed for students, tutors, and admins to seamlessly interact, share resources, and manage study sessions.
 
-Currently, two official plugins are available:
+## 🔗 Live Website
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+🌐 [Visit Colearn](https://colearn-cbb39.web.app/)
 
-## Expanding the ESLint configuration
+![Colearn Thumbnail](https://colearn-cbb39.web.app/colearn-thumb.png)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## 👨‍💼 Admin Access
+
+- **Username (Email):** admin@user.com
+- **Password:** Admin123456
+
+> ⚠️ For security reasons, please change the default password if deployed publicly.
+
+---
+
+## 🌟 Key Features
+
+- 🚀 **Fully Responsive UI** – Built with TailwindCSS + DaisyUI + Framer Motion for a sleek and professional look across all devices.
+- 👤 **Role-Based Dashboard** – Dynamic dashboards for **Admin**, **Tutor**, and **Student**, each showing relevant data and controls.
+- 📚 **Study Session System** – Create, approve, reject, and book study sessions with status tracking and registration windows.
+- 🧑‍🏫 **Tutor Profiles** – Explore tutor cards, view detailed profiles with average ratings and reviews.
+- 📝 **Notes System** – Students can create, manage, and organize personal study notes.
+- 📂 **Material Upload & Viewer** – Tutors upload session materials (images, Google Drive links), with secure and filtered access.
+- 💬 **Review & Rating System** – Students can rate and review sessions, enhancing platform credibility and helping future learners.
+- 🔒 **JWT Authentication** – Secure login/register using Firebase + JWT, with email/password and social login (Google/GitHub).
+- 📊 **Dynamic Analytics** – Admin dashboard features charts and stats using **Recharts** and **React Query**.
+- 🧪 **Form Handling & Validation** – Clean and efficient form UX with **React Hook Form**, file upload to Cloudinary.
+- 💬 **User Feedback** – SweetAlert2 for interactive confirmations and alerts throughout the user flow.
+- 🌈 **AOS Animations** – Smooth entrance animations enhance user experience.
+
+---
+
+## 📦 Tech Stack
+
+| Tech                            | Description                      |
+| ------------------------------- | -------------------------------- |
+| **React 19**                    | Core frontend framework          |
+| **TailwindCSS 4 + DaisyUI**     | Modern styling and UI components |
+| **Firebase Auth**               | Authentication & hosting         |
+| **MongoDB + Express (Backend)** | REST API and DB management       |
+| **JWT**                         | Secure token-based auth          |
+| **Cloudinary**                  | Media uploads                    |
+| **React Hook Form**             | Form control and validation      |
+| **React Query**                 | Data fetching and caching        |
+| **Framer Motion**               | Animations                       |
+| **Recharts**                    | Data visualization               |
+| **SweetAlert2**                 | Alert & modal messages           |
+| **AOS**                         | On-scroll animations             |
+
+---
+
+## 📁 Installation & Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/your-username/colearn.git
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```

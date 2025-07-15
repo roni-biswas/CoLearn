@@ -27,7 +27,7 @@ const Testimonials = () => {
     <Parallax bgImage={bgImage} strength={400}>
       <section className="relative py-24">
         {/* Overlay */}
-        <div className="absolute inset-0 bg-black/60 z-0" />
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-xs z-0" />
 
         <Container>
           <div className="relative z-10 text-white">

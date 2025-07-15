@@ -1,7 +1,7 @@
 import React from "react";
 
 const TutorDetailsModal = ({ tutor, onClose }) => {
-  const { name, averageRating } = tutor;
+  const { averageRating } = tutor;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
@@ -14,15 +14,14 @@ const TutorDetailsModal = ({ tutor, onClose }) => {
         </button>
         <h2 className="text-2xl font-bold text-primary mb-2">{tutor.title}</h2>
         <p className="mb-1">
-          <strong>Tutor:</strong> {name}
+          <strong>Tutor:</strong> {tutor.tutorName}
         </p>
         <p className="mb-1">
           <strong>Rating:</strong> {averageRating.toFixed(1)}{" "}
           <span className="text-red-500">★</span>
         </p>
         <p className="mb-1">
-          <strong>Fee:</strong>{" "}
-          {tutor.registrationFee > 0 ? `$${tutor.registrationFee}` : "Free"}
+          <strong>Fee:</strong> {tutor.fee > 0 ? `$${tutor.fee}` : "Free"}
         </p>
         <p className="mb-1">
           <strong>Duration:</strong> {tutor.sessionDuration} month's

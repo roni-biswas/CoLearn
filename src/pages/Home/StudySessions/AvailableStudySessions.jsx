@@ -57,7 +57,7 @@ const AvailableStudySessions = () => {
           </p>
         </div>
 
-        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {ongoingSessions.length === 0 ? (
             <p className="col-span-full text-center text-gray-600">
               No ongoing sessions available at the moment.
@@ -76,7 +76,7 @@ const AvailableStudySessions = () => {
                   </h3>
 
                   <p className="text-sm text-gray-600 mb-4">
-                    {truncateText(session.description, 70)}
+                    {truncateText(session.description, 170)}
                   </p>
                 </div>
 

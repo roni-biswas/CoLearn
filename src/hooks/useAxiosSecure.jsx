@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import useAuth from "./useAuth";
 
 const axiosSecure = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: "https://colearn-server.vercel.app",
 });
 
 const useAxiosSecure = () => {
@@ -37,9 +37,7 @@ const useAxiosSecure = () => {
           .then(() => {
             navigate("/login");
           })
-          .catch((err) => {
-            console.log(err.code);
-          });
+          .catch(() => {});
       }
       return Promise.reject(error);
     }
