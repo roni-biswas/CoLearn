@@ -6,8 +6,6 @@ Welcome to **Colearn**, a modern, fully-responsive, and professional collaborati
 
 🌐 [Visit Colearn](https://colearn-cbb39.web.app/)
 
-![Colearn Thumbnail](https://colearn-cbb39.web.app/colearn-thumb.png)
-
 ---
 
 ## 👨‍💼 Admin Access
@@ -59,7 +57,7 @@ Welcome to **Colearn**, a modern, fully-responsive, and professional collaborati
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/colearn.git
+git clone https://github.com/roni-biswas/colearn.git
 
 # Install dependencies
 npm install
